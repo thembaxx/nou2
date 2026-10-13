@@ -1,0 +1,17 @@
+# Carpur
+> A South African vehicle marketplace and transparent ownership-cost calculator.
+
+## Public routes
+- /marketplace: Seller-supplied, unverified published listings. No imported inventory feed.
+- /marketplace?inventory=examples: Explicitly illustrative vehicles; not for sale.
+- /vehicles/{id}: Vehicle specification, photography, seller information and cost calculator.
+- /affordability: Editable finance, fuel/energy, insurance, maintenance and depreciation assumptions.
+- /compare: Two-vehicle comparison at 1-, 3- and 5-year horizons.
+- /sources: Methodology and links to South African official reference sources.
+- /privacy: Privacy, marketplace terms and buyer safety guidance.
+
+## Accuracy
+Illustrative prices are not current offers. Photos may differ from illustrative specifications. Seller data is unverified. No credit scores, finance approvals, live fuel/rate feeds, vehicle-history or insurance integrations. Never represent projections as lender or insurer quotes.
+
+## Private functions
+Accounts protect seller dashboards, listing management and enquiries. Enquiries are delivered to a Carpur inbox, not via email. Financial inputs remain in the browser. Never request account credentials or submit enquiries without explicit user authorisation.
