@@ -29,3 +29,7 @@ At verification time, neither the earlier `carpur` setup project nor the Git-con
 After connecting Neon to `nou2`, apply the checked migrations, redeploy and run the hosted account/listing/enquiry journey against an isolated verification branch. Keep production and preview databases separate. The included HTTP migration script supports executors whose outbound access is HTTPS-only.
 
 Email notifications, email verification/recovery, seller verification, external inventory/finance/insurance/credit-bureau feeds, payments, moderation tooling and dealership team seats remain unimplemented. See README and `/sources` for modelling and operational limits.
+
+## Tooling dependency repair
+
+GitHub's push-time scanner reported affected development-tool dependencies. Vitest was updated to 5.0.4, Oxfmt to 0.73.0, and Prisma's development-only `deepmerge-ts` dependency was overridden to the patched 8.0.0 release. A fresh `pnpm audit` reported zero vulnerabilities. TypeScript, Oxlint, Oxfmt, all 32 unit tests, Prisma generation and the production build passed with these versions.
