@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { BODY_TYPES, FUEL_TYPES } from "@/lib/vehicle-options";
 import type { Vehicle } from "@/lib/types";
 import { VehicleCard } from "./vehicle-card";
 import { useGarage } from "./providers";
@@ -8,18 +9,24 @@ import { Button } from "./ui/button";
 export function Marketplace({
   vehicles,
   available,
-  illustrative,
+  mode,
+  initial,
 }: {
   vehicles: Vehicle[];
   available: boolean;
-  illustrative: boolean;
+  mode: "catalogue" | "sellers" | "examples";
+  initial: { condition: string; body: string; fuel: string; query: string };
 }) {
-  const [query, setQuery] = useState("");
+  const illustrative = mode === "examples";
+  const reference = mode === "catalogue";
+  const [condition, setCondition] = useState(initial.condition);
+  const [fuel, setFuel] = useState(initial.fuel);
+  const [query, setQuery] = useState(initial.query);
   const [make, setMake] = useState("");
   const [max, setMax] = useState("");
   const [type, setType] = useState("");
-  const [body, setBody] = useState("");
-  const [sort, setSort] = useState("newest");
+  const [body, setBody] = useState(initial.body);
+  const [sort, setSort] = useState("new-first");
   const { error } = useGarage();
   const visible = vehicles
     .filter(
@@ -28,7 +35,9 @@ export function Marketplace({
         (!make || v.make === make) &&
         (!max || v.price <= Number(max)) &&
         (!type || v.sellerType === type) &&
-        (!body || v.bodyType === body),
+        (!body || v.bodyType === body) &&
+        (!condition || v.condition === condition) &&
+        (!fuel || v.fuelType === fuel),
     )
     .sort((a, b) =>
       sort === "price-low"
@@ -37,28 +46,64 @@ export function Marketplace({
           ? b.price - a.price
           : sort === "mileage"
             ? a.km - b.km
-            : 0,
+            : sort === "new-first"
+              ? a.condition === b.condition
+                ? 0
+                : a.condition === "NEW"
+                  ? -1
+                  : 1
+              : 0,
     );
   return (
     <>
-      <div className="mb-8 flex flex-wrap gap-3">
-        <Button asChild variant={illustrative ? "outline" : "default"} size="sm">
-          <Link href="/marketplace">Seller listings</Link>
+      <div className="mb-8 flex flex-wrap gap-3" aria-label="Inventory source">
+        <Button asChild variant={reference ? "default" : "outline"} size="sm">
+          <Link href="/marketplace">New Car Catalogue</Link>
+        </Button>
+        <Button asChild variant={mode === "sellers" ? "default" : "outline"} size="sm">
+          <Link href="/marketplace?inventory=sellers">Seller Listings</Link>
         </Button>
         <Button asChild variant={illustrative ? "default" : "outline"} size="sm">
-          <Link href="/marketplace?inventory=examples">Illustrative vehicles</Link>
+          <Link href="/marketplace?inventory=examples">Illustrative Vehicles</Link>
         </Button>
       </div>
+      {reference && (
+        <p className="notice mb-8">
+          Manufacturer reference prices observed 13 October 2026. These models are not verified
+          dealer stock or Carpur offers. Confirm the current price, on-road fees, options and
+          delivery time with the manufacturer’s dealer network. Current catalogue coverage: Toyota;
+          seller listings support any make.
+        </p>
+      )}
+      {!reference && (
+        <div className="mb-6 flex flex-wrap gap-3" aria-label="Vehicle condition">
+          {[
+            ["", "New First"],
+            ["NEW", "New Cars"],
+            ["USED", "Second Hand"],
+          ].map(([value, label]) => (
+            <Button
+              key={value}
+              variant={condition === value ? "default" : "outline"}
+              size="sm"
+              aria-pressed={condition === value}
+              onClick={() => setCondition(value)}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+      )}
       {illustrative && (
         <p className="notice mb-8">
           These examples are not for sale. Prices and specifications are illustrative; photography
           may differ from the described model. Use them to explore forecasts.
         </p>
       )}
-      {!available && !illustrative && (
+      {!available && mode === "sellers" && (
         <p className="notice mb-8" role="status">
-          The inventory service is temporarily unavailable. Please try again later, or explore
-          illustrative vehicles.
+          The inventory service is temporarily unavailable. Please try again later, or browse the
+          manufacturer catalogue.
         </p>
       )}
       <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -103,15 +148,25 @@ export function Marketplace({
           Body type
           <select className="field" value={body} onChange={(e) => setBody(e.target.value)}>
             <option value="">All body types</option>
-            {["Sedan", "Hatchback", "SUV", "Bakkie", "Coupe", "Other"].map((v) => (
+            {BODY_TYPES.map((v) => (
               <option key={v}>{v}</option>
+            ))}
+          </select>
+        </label>
+        <label className="label">
+          Powertrain
+          <select className="field" value={fuel} onChange={(e) => setFuel(e.target.value)}>
+            <option value="">All powertrains</option>
+            {FUEL_TYPES.map((value) => (
+              <option key={value}>{value}</option>
             ))}
           </select>
         </label>
         <label className="label">
           Sort by
           <select className="field" value={sort} onChange={(e) => setSort(e.target.value)}>
-            <option value="newest">Newest listings</option>
+            <option value="new-first">New cars first</option>
+            <option value="newest">Recently listed</option>
             <option value="price-low">Price: low to high</option>
             <option value="price-high">Price: high to low</option>
             <option value="mileage">Lowest mileage</option>
@@ -120,14 +175,18 @@ export function Marketplace({
       </div>
       <p role="status" className="mb-5 text-sm text-slate-400">
         {visible.length} vehicle{visible.length === 1 ? "" : "s"}
-        {illustrative ? " · illustrative inventory" : " · seller supplied listings"}
+        {illustrative
+          ? " · illustrative inventory"
+          : reference
+            ? " · manufacturer catalogue models"
+            : " · seller supplied listings"}
       </p>
       {error && (
         <p role="alert" className="notice mb-5">
           {error}
         </p>
       )}
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="vehicle-grid">
         {visible.map((v) => (
           <VehicleCard key={v.id} vehicle={v} />
         ))}
@@ -151,6 +210,8 @@ export function Marketplace({
                 setMax("");
                 setType("");
                 setBody("");
+                setCondition("");
+                setFuel("");
               }}
             >
               Clear filters

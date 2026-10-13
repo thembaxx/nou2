@@ -6,7 +6,7 @@ GitHub target: **thembaxx/nou2** (updated by the user during implementation).
 
 ## Stack
 
-Next.js 16 App Router, React, TypeScript, Tailwind 4, shadcn-style Radix primitives, pnpm 10.18, Oxlint, Oxfmt, Motion, opt-in React Three Fiber / Three.js, Recharts, PostgreSQL, Prisma 6 and Better Auth.
+Next.js 16 App Router, React, TypeScript, Tailwind 4, shadcn-style Radix primitives, pnpm 10.18, Oxlint, Oxfmt, Motion, adaptive React Three Fiber / Three.js, Recharts, PostgreSQL, Prisma 6 and Better Auth.
 
 ## Local setup
 
@@ -22,7 +22,7 @@ pnpm dev
 
 In managed environments whose fallback `pnpm` differs, use `npx -y pnpm@10.18.0` for each command. `pnpm-workspace.yaml` permits only the reviewed Prisma, esbuild and sharp build scripts.
 
-Without database/auth configuration, browsing examples and financial tools work. Publishing and enquiries fail closed rather than reporting success.
+Without database/auth configuration, the manufacturer catalogue, browser garage, 3D explorer and financial tools work. Publishing and enquiries fail closed rather than reporting success.
 
 ## Validation
 
@@ -45,13 +45,15 @@ Use `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium` when the host provides Ch
 
 ## Features
 
-- Separate seller inventory and explicitly illustrative inventory, search, make/price/body/seller filters and sorting.
+- Buying-first home with new cars before used cars, manufacturer catalogue, seller inventory and explicitly illustrative examples. New/used condition, make, price, body, powertrain and seller filters.
+- 44 real Toyota variants from ten official South African model pages, dated reference prices/specifications, source links and external manufacturer buying options. Catalogue models are never disguised as stock. Seller listings accept any make and broad body/powertrain types.
 - Routed vehicle details, photo galleries, seller information, safety guidance and enquiry inbox delivery.
 - Private and dealership listings, compressed uploads or HTTPS photo URLs, drafts, publish/edit/sold/archive/delete workflows and owner checks.
 - Seller dashboard, buyer garage with authenticated cross-device saves and anonymous browser saves.
-- Editable fixed-rate finance, deposit, balloon, term, fuel/energy, insurance, maintenance and depreciation; 1/3/5-year cash and net ownership projections; comparison and accessible chart tables.
+- Editable fixed-rate finance, deposit, balloon, term, fuel/energy, insurance, maintenance and depreciation; separate PHEV charging allowances; 1/3/5-year cash and net ownership projections; stress scenarios, different energy prices in comparison and accessible chart tables.
 - No credit scores or finance approvals. All default financial figures are illustrative. Official source links and methodology are documented at `/sources`.
-- Responsive layout, keyboard focus, skip link, Radix focus-managed enquiry/delete dialogs, reduced motion, lazy charts and opt-in schematic 3D.
+- Mobile-first squircle layouts from 320 px to wide desktops; light/dark/device themes, 44 px touch targets, keyboard controls, reduced motion and progressive scroll reveals.
+- Native real-car 3D models of Ferrari 458 family and BMW M3 E30 with drag/pinch gestures, zoom/reset, paint preview, interior visibility and opt-in rotation. Eight-angle previews rendered from those actual assets for modest devices; demand rendering, bounded DPR, enhanced materials/shadows, offscreen/background suspension and persistent battery/detail overrides. Toyota Corolla Cross is a licensed source reference with an external viewing link; no embedded integration is claimed. Rich charts and Motion load only when useful.
 - Installable PWA manifest and PNG icons, public asset caching and an offline fallback. Account pages, messages, RSC responses and APIs are never cached by the service worker.
 - Page metadata, structured data for actual listings, dynamic sitemap, robots and llms.txt.
 
@@ -69,8 +71,8 @@ The migration script only creates Carpur tables and indexes. It does not insert 
 
 ## Current limits
 
-No external inventory feed, lender, insurer, credit bureau, vehicle-history, payment or automated email integration. Enquiries are delivered to the seller's Carpur inbox; the seller replies by email. Email verification and password recovery are pending. Seller/dealership identity and vehicle condition are unverified. Dealership team seats, moderation tooling and a dedicated privacy/support channel are pending. Photos are capped at 6 and 1 MB total per listing and stored as separate PostgreSQL bytea records, served on demand; object storage/CDN is recommended at scale. Inventory shows the newest 200 published listings and accounts support up to 100 listings; server pagination is pending. Comparison applies shared financial allowances; individual calculators support separate quotations. The 3D view is a generic schematic, not a scan of a listed vehicle.
+No external inventory feed, lender, insurer, credit bureau, vehicle-history, payment or automated email integration. Enquiries are delivered to the seller's Carpur inbox; the seller replies by email. Email verification and password recovery are pending. Seller/dealership identity and vehicle condition are unverified. Dealership team seats, moderation tooling and a dedicated privacy/support channel are pending. Photos are capped at 6 and 1 MB total per listing and stored as separate PostgreSQL bytea records, served on demand; object storage/CDN is recommended at scale. Inventory shows up to 200 published listings, new cars first and accounts support up to 100 listings; server pagination is pending. Comparison uses separate energy prices and charging allowances, with shared insurance/maintenance and conservative disclosed PHEV consumption; individual calculators support separate quotations. Native 3D coverage is currently Ferrari 458 family and BMW M3 E30. Model-family/year matching prevents showing those assets as unrelated cars; unmatched vehicles use photographs. These are artist models, not scans of seller stock. See public/models/CREDITS.md. Manufacturer coverage is currently Toyota; new sources and a verified stock feed are still needed for complete market coverage. Manufacturer photos are externally hosted. See docs/catalogue.md.
 
 ## Photography
 
-Editorial images retain the archive’s Unsplash references for the hero, BMW and Mercedes-Benz. The archive’s incorrect Golf and Toyota images were replaced with attributed Wikimedia Commons photos. All are bundled locally for performance. They are not evidence of model, trim, condition or a vehicle offered for sale. See `docs/photography.md` for source URLs.
+Editorial images retain the archive’s Unsplash references for the hero, BMW and Mercedes-Benz. The archive’s incorrect Golf and Toyota images were replaced with attributed Wikimedia Commons photos. Editorial derivatives are bundled locally; manufacturer catalogue images stay on the manufacturer’s CDN. They are not evidence of model, trim, condition or a vehicle offered for sale. See `docs/photography.md` for source URLs.

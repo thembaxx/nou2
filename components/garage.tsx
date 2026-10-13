@@ -12,7 +12,7 @@ export function Garage({ vehicles }: { vehicles: Vehicle[] }) {
     <>
       <p className="notice mb-8">
         {user
-          ? "Live vehicles are saved to your account. Illustrative vehicles stay in this browser."
+          ? "Live vehicles are saved to your account. Catalogue models and illustrative vehicles stay in this browser."
           : "Your garage is saved in this browser. Sign in to save live vehicles across devices."}
       </p>
       {error && (
@@ -27,15 +27,15 @@ export function Garage({ vehicles }: { vehicles: Vehicle[] }) {
           </Link>
         </Button>
       )}
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="vehicle-grid">
         {saved
-          .filter((v) => v.status === "PUBLISHED" || v.example)
+          .filter((v) => v.status === "PUBLISHED" || v.example || v.reference)
           .map((v) => (
             <VehicleCard key={v.id} vehicle={v} />
           ))}
       </div>
       {saved
-        .filter((v) => v.status !== "PUBLISHED" && !v.example)
+        .filter((v) => v.status !== "PUBLISHED" && !v.example && !v.reference)
         .map((v) => (
           <div key={v.id} className="panel mt-5 p-5">
             <p>{v.name} · no longer available</p>
@@ -57,7 +57,7 @@ export function Garage({ vehicles }: { vehicles: Vehicle[] }) {
           <h2 className="mb-3 text-2xl font-bold">Your shortlist starts here.</h2>
           <p className="mb-6 text-slate-400">Tap the heart on any vehicle to save it.</p>
           <Button asChild>
-            <Link href="/marketplace?inventory=examples">Explore vehicles</Link>
+            <Link href="/marketplace">Explore vehicles</Link>
           </Button>
         </div>
       )}

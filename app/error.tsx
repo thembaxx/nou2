@@ -4,9 +4,9 @@ export default function ErrorPage({ reset }: { reset: () => void }) {
   return (
     <div className="page">
       <h1 className="page-title mb-6">
-        A MOMENTARY
+        A Momentary
         <br />
-        DETOUR.
+        Detour.
       </h1>
       <p className="mb-8 text-slate-400">We could not load this page. Please try again.</p>
       <Button onClick={reset}>Try again</Button>

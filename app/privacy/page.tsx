@@ -4,9 +4,9 @@ export default function Page() {
     <article className="page prose-copy !max-w-4xl">
       <p className="eyebrow">Privacy & marketplace terms</p>
       <h1 className="page-title mt-5">
-        A CLEARER.
+        A Clearer.
         <br />
-        SAFER JOURNEY.
+        Safer Journey.
       </h1>
       <h2>Your data</h2>
       <p>
@@ -23,9 +23,11 @@ export default function Page() {
       </p>
       <p>
         Affordability inputs stay in the current page and are not sent to the server. Anonymous
-        saved vehicles and illustrative vehicles use browser local storage. Signed-in live vehicle
-        saves use your account. Carpur uses essential session cookies. No advertising trackers or
-        analytics integrations have been added.
+        saved vehicles, catalogue models and illustrative vehicles use browser local storage. Theme
+        and visual-quality preferences also stay in this browser. Automatic visual quality reads
+        available hardware, connection and reduced-motion preferences locally; these signals are not
+        sent to Carpur. Signed-in live vehicle saves use your account. Carpur uses essential session
+        cookies. No advertising trackers or analytics integrations have been added.
       </p>
       <h2>Control and retention</h2>
       <p>

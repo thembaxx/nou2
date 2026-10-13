@@ -1,0 +1,20 @@
+{
+  "uid": "cfcaebfa5e5a4170b6f2db8db7ca3436",
+  "name": "2021_toyota_corolla_cross",
+  "license": {
+    "uri": "https://api.sketchfab.com/v3/licenses/322a749bcfa841b29dff1e8a1bb74b0b",
+    "label": "CC Attribution",
+    "fullName": "Creative Commons Attribution",
+    "requirements": "Author must be credited. Commercial use is allowed.",
+    "url": "http://creativecommons.org/licenses/by/4.0/",
+    "slug": "by"
+  },
+  "faceCount": 597221,
+  "isDownloadable": true,
+  "author": {
+    "username": "tangwang920",
+    "displayName": "007",
+    "profileUrl": "https://sketchfab.com/tangwang920"
+  },
+  "checkedAt": "2026-10-13"
+}

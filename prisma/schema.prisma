@@ -85,6 +85,7 @@ model Listing {
   userId       String
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   name         String
+  condition    String         @default("USED")
   make         String
   year         Int
   price        Int
@@ -106,6 +107,7 @@ model Listing {
   savedBy      SavedVehicle[]
 
   @@index([status, createdAt])
+  @@index([status, condition, createdAt])
   @@index([userId])
 }
 

@@ -5,9 +5,9 @@ export default function NotFound() {
     <div className="page">
       <p className="eyebrow mb-4">Vehicle or page unavailable</p>
       <h1 className="page-title mb-6">
-        A DIFFERENT
+        A Different
         <br />
-        ROAD AHEAD.
+        Road Ahead.
       </h1>
       <p className="mb-8 text-slate-400">
         This vehicle may have been sold or the page may no longer exist.

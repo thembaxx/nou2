@@ -1,5 +1,13 @@
 export type Vehicle = {
   id: string;
+  condition: "NEW" | "USED";
+  reference?: {
+    url: string;
+    checkedAt: string;
+    range: string;
+    seats: number;
+    consumptionAvailable: boolean;
+  };
   name: string;
   make: string;
   year: number;

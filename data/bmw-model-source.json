@@ -1,0 +1,20 @@
+{
+  "uid": "ac3c7013434e403e8faff87948caf422",
+  "name": "[FREE] BMW M3 E30",
+  "license": {
+    "uri": "https://api.sketchfab.com/v3/licenses/322a749bcfa841b29dff1e8a1bb74b0b",
+    "label": "CC Attribution",
+    "fullName": "Creative Commons Attribution",
+    "requirements": "Author must be credited. Commercial use is allowed.",
+    "url": "http://creativecommons.org/licenses/by/4.0/",
+    "slug": "by"
+  },
+  "faceCount": 117261,
+  "isDownloadable": true,
+  "author": {
+    "username": "TinoD2",
+    "displayName": "Martin Trafas",
+    "profileUrl": "https://sketchfab.com/TinoD2"
+  },
+  "checkedAt": "2026-10-13"
+}

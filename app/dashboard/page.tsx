@@ -28,7 +28,7 @@ export default async function Page() {
       <p className="eyebrow mb-4">Seller dashboard</p>
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
         <div>
-          <h1 className="page-title">YOUR NEXT CHAPTER.</h1>
+          <h1 className="page-title">Your Next Chapter.</h1>
           <p className="mt-4 text-slate-400">
             Welcome, {session.user.name}. Manage your listings and buyer enquiries.
           </p>

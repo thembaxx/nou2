@@ -41,6 +41,20 @@ describe("fixed-rate finance", () => {
 });
 describe("ownership forecasting", () => {
   it("calculates fuel independently", () => expect(forecast(base).fuel).toBe(1680));
+  it("includes PHEV charging separately from petrol at every horizon", () => {
+    const baseline = forecast(base, 3);
+    const phev = forecast({ ...base, chargingMonthly: 450 }, 3);
+    expect(phev.fuel - baseline.fuel).toBe(450);
+    expect(phev.cash - baseline.cash).toBe(450 * 36);
+    expect(phev.economic - baseline.economic).toBeCloseTo(450 * 36);
+  });
+  it("prices electric consumption in kWh rather than petrol units", () => {
+    expect(forecast({ ...base, litresPer100Km: 16, fuelPrice: 4 }).fuel).toBe(640);
+  });
+  it("rejects nonfinite and negative charging costs", () => {
+    for (const chargingMonthly of [-1, Infinity, NaN])
+      expect(() => forecast({ ...base, chargingMonthly })).toThrow();
+  });
   it("keeps the economic cost identity", () => {
     const x = forecast(base, 3);
     expect(x.economic).toBeCloseTo(x.cash + x.balance - x.resale);

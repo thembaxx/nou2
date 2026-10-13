@@ -1,13 +1,15 @@
 "use client";
 import { useState } from "react";
+import { useDevicePreferences } from "./device-preferences";
 import { Button } from "./ui/button";
+import { BODY_TYPES, FUEL_TYPES, MAKES, TRANSMISSIONS, energyUnit } from "@/lib/vehicle-options";
 import type { Vehicle } from "@/lib/types";
 type ListingData = Omit<Vehicle, "id" | "example">;
-async function compressPhoto(file: File): Promise<string> {
+async function compressPhoto(file: File, maxEdge: number): Promise<string> {
   if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 10000000)
     throw new Error("Use JPEG, PNG or WebP images under 10 MB.");
   const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));
+  const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
@@ -23,6 +25,7 @@ async function compressPhoto(file: File): Promise<string> {
   return data;
 }
 export function ListingForm({ initial }: { initial?: Vehicle }) {
+  const { tier } = useDevicePreferences();
   const [form, setForm] = useState<ListingData>(
     initial || {
       name: "",
@@ -30,6 +33,7 @@ export function ListingForm({ initial }: { initial?: Vehicle }) {
       year: new Date().getFullYear(),
       price: 0,
       km: 0,
+      condition: "USED",
       fuel: 7,
       fuelType: "Petrol",
       transmission: "Automatic",
@@ -54,6 +58,7 @@ export function ListingForm({ initial }: { initial?: Vehicle }) {
         {label}
         <input
           className="field"
+          list={key === "make" ? "vehicle-makes" : undefined}
           required
           minLength={2}
           maxLength={100}
@@ -113,12 +118,28 @@ export function ListingForm({ initial }: { initial?: Vehicle }) {
       }}
     >
       <div className="grid gap-5 sm:grid-cols-2">
+        <label className="label">
+          Vehicle condition
+          <select
+            className="field"
+            value={form.condition}
+            onChange={(e) => change("condition", e.target.value as "NEW" | "USED")}
+          >
+            <option value="NEW">New</option>
+            <option value="USED">Used / second hand</option>
+          </select>
+        </label>
+        <datalist id="vehicle-makes">
+          {MAKES.map((make) => (
+            <option key={make} value={make} />
+          ))}
+        </datalist>
         {text("name", "Make, model & trim")}
         {text("make", "Make")}
         {number("year", "Year", 1950, new Date().getFullYear() + 1)}
         {number("price", "Asking price (R)", 1000, 10000000)}
         {number("km", "Mileage (km)", 0, 2000000)}
-        {number("fuel", "Consumption (L or kWh / 100 km)", 0, 40, 0.1)}
+        {number("fuel", `Consumption (${energyUnit(form.fuelType)} / 100 km)`, 0, 100, 0.1)}
         {text("location", "City / suburb")}
         {text("sellerName", "Seller or dealership name")}
         <label className="label">
@@ -134,9 +155,9 @@ export function ListingForm({ initial }: { initial?: Vehicle }) {
         </label>
         {(
           [
-            ["fuelType", "Fuel type", ["Petrol", "Diesel", "Hybrid", "Electric"]],
-            ["transmission", "Transmission", ["Automatic", "Manual"]],
-            ["bodyType", "Body style", ["Sedan", "Hatchback", "SUV", "Bakkie", "Coupe", "Other"]],
+            ["fuelType", "Fuel type", FUEL_TYPES],
+            ["transmission", "Transmission", TRANSMISSIONS],
+            ["bodyType", "Body style", BODY_TYPES],
           ] as const
         ).map(([key, label, values]) => (
           <label key={key} className="label">
@@ -187,7 +208,9 @@ export function ListingForm({ initial }: { initial?: Vehicle }) {
               try {
                 if (form.images.length + files.length > 6)
                   throw new Error("Use a maximum of 6 photos.");
-                const photos = await Promise.all(files.map(compressPhoto));
+                const photos: string[] = [];
+                const maxEdge = tier === "reduced" ? 960 : tier === "enhanced" ? 1600 : 1200;
+                for (const file of files) photos.push(await compressPhoto(file, maxEdge));
                 if ([...form.images, ...photos].join("").length > 1000000)
                   throw new Error(
                     "Photos must total less than 1 MB. Remove one or use smaller images.",

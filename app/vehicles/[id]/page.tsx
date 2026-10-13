@@ -6,8 +6,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const v = await vehicleById((await params).id);
   return v
     ? {
-        title: `${v.name}${v.example ? " — illustrative" : ""}`,
-        description: `${v.year} ${v.name} in ${v.location}. Explore specifications and estimated ownership costs.`,
+        title: `${v.name}${v.reference ? " — new car reference" : v.example ? " — illustrative" : ""}`,
+        description: `${v.name} in ${v.location}. Explore specifications, buying options and estimated ownership costs.`,
         robots: v.example ? { index: false, follow: true } : undefined,
         alternates: { canonical: `/vehicles/${v.id}` },
       }
@@ -20,16 +20,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     "@context": "https://schema.org",
     "@type": "Car",
     name: v.name,
-    vehicleModelDate: String(v.year),
+    vehicleModelDate: v.reference ? undefined : String(v.year),
     fuelType: v.fuelType,
     url: `${siteUrl()}/vehicles/${v.id}`,
     description: v.description,
-    mileageFromOdometer: { "@type": "QuantitativeValue", value: v.km, unitCode: "KMT" },
+    mileageFromOdometer: v.reference
+      ? undefined
+      : { "@type": "QuantitativeValue", value: v.km, unitCode: "KMT" },
   };
   return (
     <div className="page">
       <VehicleDetail vehicle={v} />
-      <h2 className="page-title mb-8">KNOW THE COST.</h2>
+      <h2 className="page-title mb-8">Know The Cost.</h2>
       <FinanceTool vehicles={[v]} initialId={v.id} />
       {!v.example && (
         <script

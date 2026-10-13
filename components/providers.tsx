@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { MotionConfig } from "motion/react";
+import { ThemePreferences } from "./theme-preferences";
+import { DevicePreferences } from "./device-preferences";
 type User = { id: string; name: string; email: string } | null;
 type GarageContext = {
   user: User;
@@ -20,10 +21,12 @@ export function Providers({
   children,
   user,
   savedIds,
+  initialSaveData,
 }: {
   children: React.ReactNode;
   user: User;
   savedIds: string[];
+  initialSaveData?: boolean;
 }) {
   const [ids, setIds] = useState(savedIds);
   const [error, setError] = useState("");
@@ -33,7 +36,7 @@ export function Providers({
       const local: unknown = JSON.parse(localStorage.getItem("carpur-garage-v1") || "[]");
       const localIds = Array.isArray(local)
         ? local.filter(
-            (v): v is string => typeof v === "string" && (!user || v.startsWith("example-")),
+            (v): v is string => typeof v === "string" && (!user || /^(example|catalogue)-/.test(v)),
           )
         : [];
       setIds([...new Set([...savedIds, ...localIds])]);
@@ -45,7 +48,7 @@ export function Providers({
   async function toggle(id: string) {
     const saved = ids.includes(id);
     setError("");
-    if (user && !id.startsWith("example-")) {
+    if (user && !/^(example|catalogue)-/.test(id)) {
       try {
         const response = await fetch(`/api/garage/${encodeURIComponent(id)}`, {
           method: saved ? "DELETE" : "POST",
@@ -66,7 +69,7 @@ export function Providers({
       try {
         localStorage.setItem(
           "carpur-garage-v1",
-          JSON.stringify(next.filter((v) => !user || v.startsWith("example-"))),
+          JSON.stringify(next.filter((v) => !user || /^(example|catalogue)-/.test(v))),
         );
       } catch {
         setError("Browser storage is unavailable. This save lasts until you leave the page.");
@@ -75,9 +78,11 @@ export function Providers({
     });
   }
   return (
-    <MotionConfig reducedMotion="user">
-      <Context.Provider value={{ user, ready, ids, error, toggle }}>{children}</Context.Provider>
-    </MotionConfig>
+    <ThemePreferences>
+      <DevicePreferences initialSaveData={initialSaveData}>
+        <Context.Provider value={{ user, ready, ids, error, toggle }}>{children}</Context.Provider>
+      </DevicePreferences>
+    </ThemePreferences>
   );
 }
 export const useGarage = () => useContext(Context);

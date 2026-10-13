@@ -1,11 +1,13 @@
 "use client";
+import { ResponsivePhoto } from "./responsive-photo";
 import { PhotoCredit } from "./photo-credit";
+import { energyUnit, planningConsumption, planningEnergyPrice } from "@/lib/vehicle-options";
 import { useState } from "react";
-import dynamic from "next/dynamic";
+import { AdaptiveCostChart } from "./adaptive-cost-chart";
 import Link from "next/link";
 import type { Vehicle } from "@/lib/types";
 import { forecast, zar } from "@/lib/finance";
-const CostChart = dynamic(() => import("./cost-chart"), { ssr: false });
+
 export function CompareTool({
   vehicles,
   initialIds = [],
@@ -20,7 +22,26 @@ export function CompareTool({
   const [term, setTerm] = useState(72);
   const [balloon, setBalloon] = useState(0);
   const [distance, setDistance] = useState(15000);
-  const [fuelPrice, setFuelPrice] = useState(24);
+  const [firstEnergy, setFirstEnergy] = useState(
+    planningEnergyPrice(
+      vehicles.find((v) => v.id === (initialIds[0] || vehicles[0]?.id))?.fuelType,
+    ),
+  );
+  const [secondEnergy, setSecondEnergy] = useState(
+    planningEnergyPrice(
+      vehicles.find((v) => v.id === (initialIds[1] || vehicles[1]?.id))?.fuelType,
+    ),
+  );
+  const [firstCharging, setFirstCharging] = useState(
+    vehicles.find((v) => v.id === (initialIds[0] || vehicles[0]?.id))?.fuelType === "Plug-in Hybrid"
+      ? 450
+      : 0,
+  );
+  const [secondCharging, setSecondCharging] = useState(
+    vehicles.find((v) => v.id === (initialIds[1] || vehicles[1]?.id))?.fuelType === "Plug-in Hybrid"
+      ? 450
+      : 0,
+  );
   const [insurance, setInsurance] = useState(1500);
   const [maintenance, setMaintenance] = useState(900);
   const [depreciation, setDepreciation] = useState(12);
@@ -42,8 +63,9 @@ export function CompareTool({
         annualRate: rate,
         months: term,
         distanceKm: distance,
-        litresPer100Km: v.fuel,
-        fuelPrice,
+        litresPer100Km: planningConsumption(v),
+        fuelPrice: v.id === first ? firstEnergy : secondEnergy,
+        chargingMonthly: v.id === first ? firstCharging : secondCharging,
         insuranceMonthly: insurance,
         maintenanceMonthly: maintenance,
         depreciationAnnual: depreciation,
@@ -74,41 +96,67 @@ export function CompareTool({
   }
   return (
     <>
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="compare-vehicles">
         {pair.map((v, i) => (
-          <div className="panel p-5" key={i}>
+          <div className="panel compare-vehicle" key={i}>
             <label className="label">
               Vehicle {i + 1}
               <select
+                aria-label={`Vehicle ${i + 1}`}
                 className="field"
                 value={i === 0 ? first : second}
-                onChange={(e) => (i === 0 ? setFirst : setSecond)(e.target.value)}
+                onChange={(e) => {
+                  (i === 0 ? setFirst : setSecond)(e.target.value);
+                  const selected = vehicles.find((v) => v.id === e.target.value);
+                  (i === 0 ? setFirstEnergy : setSecondEnergy)(
+                    planningEnergyPrice(selected?.fuelType),
+                  );
+                  (i === 0 ? setFirstCharging : setSecondCharging)(
+                    selected?.fuelType === "Plug-in Hybrid" ? 450 : 0,
+                  );
+                }}
               >
                 <option value="">Select a vehicle</option>
                 {vehicles.map((car) => (
                   <option key={car.id} value={car.id}>
                     {car.name}
-                    {car.example ? " (illustrative)" : ""}
+                    {car.example
+                      ? " (illustrative)"
+                      : car.reference
+                        ? " (manufacturer reference)"
+                        : ""}
                   </option>
                 ))}
               </select>
             </label>
             {v && (
               <>
-                <img
-                  className="mt-5 h-56 w-full object-cover"
+                <ResponsivePhoto
+                  className="compare-photo mt-4"
                   src={v.images[0]}
+                  sizes="(min-width: 1400px) 720px, 45vw"
                   alt={v.example ? `Editorial image for ${v.name} example` : v.name}
                   width={800}
                   height={500}
                 />
-                <h2 className="mt-5 text-2xl font-bold">{v.name}</h2>
-                <p className="mt-2 text-slate-400">
-                  {zar(v.price)} · {v.fuel} {v.fuelType === "Electric" ? "kWh" : "L"}/100 km
+                <h2 className="mt-4 font-bold">{v.name}</h2>
+                <p className="mt-2 text-xs leading-relaxed text-slate-400 sm:text-sm">
+                  {zar(v.price)} · {v.fuel} {energyUnit(v.fuelType)}/100 km
                 </p>
                 {v.example && (
                   <p className="mt-3 text-xs text-blue-300">Illustrative · not for sale</p>
                 )}
+                {v.reference && (
+                  <p className="mt-3 text-xs text-blue-200">
+                    Manufacturer Reference · Not Verified Stock
+                  </p>
+                )}
+                <Link
+                  href={`/vehicles/${v.id}`}
+                  className="mt-3 inline-flex min-h-11 items-center text-xs text-blue-200 underline"
+                >
+                  View Buying Options
+                </Link>
                 <PhotoCredit id={v.id} />
               </>
             )}
@@ -138,16 +186,43 @@ export function CompareTool({
           </label>
           {number("Balloon (% of price)", balloon, setBalloon, 100)}
           {number("Annual distance (km)", distance, setDistance, 150000)}
-          {number("Fuel / energy price (R per unit)", fuelPrice, setFuelPrice, 100, 0.01)}
+          {number(
+            `Vehicle 1 Energy Price (R/${energyUnit(pair[0]?.fuelType || "Petrol")})`,
+            firstEnergy,
+            setFirstEnergy,
+            500,
+            0.01,
+          )}
+          {number(
+            `Vehicle 2 Energy Price (R/${energyUnit(pair[1]?.fuelType || "Petrol")})`,
+            secondEnergy,
+            setSecondEnergy,
+            500,
+            0.01,
+          )}
+          {number(
+            "Vehicle 1 Additional Charging (R/month)",
+            firstCharging,
+            setFirstCharging,
+            50000,
+          )}
+          {number(
+            "Vehicle 2 Additional Charging (R/month)",
+            secondCharging,
+            setSecondCharging,
+            50000,
+          )}
           {number("Insurance (R/month)", insurance, setInsurance, 50000)}
           {number("Maintenance (R/month)", maintenance, setMaintenance, 50000)}
           {number("Annual depreciation (%)", depreciation, setDepreciation, 100, 0.1)}
         </div>
         <p className="mt-5 text-xs text-slate-400">
           Illustrative defaults. Both cars use the same rate, deposit percentage and running-cost
-          allowances to make differences clear. Use individual vehicle calculators for separate
-          quotes. Fuel and electric energy units differ: compare matching fuel types here, or use
-          separate calculators with R/kWh and R/litre.
+          allowances to make differences clear. Energy prices and charging allowances are separate
+          for each car, so petrol and electric vehicles can be compared. Plug-in hybrids use an
+          illustrative 7 L/100 km plus R450/month charging; edit charging and use the individual
+          calculator for your own consumption. Use individual calculators for separate insurance and
+          maintenance quotes.
         </p>
       </details>
       {error ? (
@@ -160,15 +235,20 @@ export function CompareTool({
           <>
             <div className="panel p-6">
               <h2 className="mb-5 text-2xl font-bold">The long view</h2>
-              <CostChart
+              <AdaptiveCostChart
                 data={[1, 3, 5].map((n) => ({
                   horizon: `${n} years`,
                   cost: costs(pair[0]!, n).economic,
                   second: costs(pair[1]!, n).economic,
                 }))}
               />
-              <div className="overflow-x-auto">
-                <table className="text-sm">
+              <div
+                className="table-scroll"
+                tabIndex={0}
+                role="region"
+                aria-label="Ownership cost projections"
+              >
+                <table className="comparison-table text-sm">
                   <caption className="py-4 text-left text-xs text-slate-400">
                     Projections in rand. Vehicle 1: {pair[0].name}. Vehicle 2: {pair[1].name}.
                   </caption>

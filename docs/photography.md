@@ -18,3 +18,9 @@ The archive's Golf photograph depicted a Lamborghini and its Toyota photograph d
 - **2023 Toyota Corolla Cross XLE 4WD in Wind Chill Pearl, front left** by **Mr.choppers**: https://commons.wikimedia.org/wiki/File:2023_Toyota_Corolla_Cross_XLE_4WD_in_Wind_Chill_Pearl,_front_left.jpg — **CC BY-SA 3.0**, https://creativecommons.org/licenses/by-sa/3.0/. This bundled image retains that licence.
 
 Both were resized to 800 px and converted to WebP. The photos are editorial references, not the specific illustrative South African vehicles or verified trim.
+
+## Responsive assets and manufacturer references
+
+Editorial assets have 320, 640, 960 and 1600 px WebP variants; the original hero also has a 2560 px variant. These are resized derivatives of the sources above and retain their attribution/licence. The home page now renders identifiable Ferrari and BMW artist models instead of the editorial hero or a generic concept car. Previews are rendered from those same assets; see public/models/CREDITS.md for attribution and retained licences. The SVG technology diagrams are original schematic illustrations, separate from actual-car geometry.
+
+Catalogue cards reference manufacturer-hosted Toyota pack shots through the source URLs recorded in `data/toyota-2026-10-13.json`. These are attributed as manufacturer model imagery through each model's source link, not photographs of cars offered on Carpur. They remain dependent on the manufacturer's image service. Carpur does not own that imagery or infer colour availability.

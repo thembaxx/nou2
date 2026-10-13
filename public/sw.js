@@ -1,4 +1,4 @@
-const CACHE = "carpur-public-assets-v3";
+const CACHE = "carpur-public-assets-v6";
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
@@ -36,6 +36,7 @@ self.addEventListener("fetch", (event) => {
   }
   if (
     url.pathname.startsWith("/images/") ||
+    url.pathname.startsWith("/models/") ||
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/icon-")
   ) {

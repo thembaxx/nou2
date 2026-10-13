@@ -1,35 +1,36 @@
 # Verification — 13 October 2026
 
-Application implementation: `da20a6fb7add7f961f3ba52a8b1af7c1c975c354`.
-GitHub: https://github.com/thembaxx/nou2
+Repository: https://github.com/thembaxx/nou2
 Production: https://nou2.vercel.app
+
+## This revision
+
+Buying-first discovery with new cars before second hand stock, a dated official Toyota catalogue, squircle controls, title case, light/dark/device themes, adaptive visuals, real-car 3D and explicit ownership uncertainty.
 
 ## Local evidence
 
-- pnpm 10.18.0 installed dependencies successfully.
-- TypeScript, Oxlint with warnings denied, Oxfmt check and production build passed.
-- 32 Vitest tests passed: amortisation, zero interest, cash purchase, balloons, loan maturity, running costs, resale, budget headroom and invalid-input boundaries.
-- Both Prisma migrations applied to an isolated PostgreSQL 17 database.
-- Four Playwright journeys passed against `next start`: search/filter/garage/calculators/comparison; account → uploaded photo → draft → dealer publish → buyer save → enquiry → seller inbox → sold → delete; mobile navigation/reduced motion; manifest/service worker/offline fallback.
-- Cross-account listing mutation returned 404; drafts and sold vehicles were inaccessible publicly. The uploaded photo remained available to its owner while drafting and publicly after publishing.
-- Desktop/mobile visual checks found no browser JavaScript errors and no mobile horizontal overflow.
+- Pinned pnpm 10.18.0; TypeScript, Oxlint with warnings denied, Oxfmt check and the production build pass.
+- 40 Vitest tests pass: financial calculations (including balloon maturity, electric energy and separate PHEV charging), validation boundaries and generation/body matching for 3D assets.
+- All three Prisma migrations applied to an isolated PostgreSQL 17 database, including the new/used condition column and inventory index. No demo data is seeded by migrations.
+- All 12 Playwright journeys pass against `next start`: buyer filtering/garage/costs/comparison; account → draft → dealer publish → buyer save → enquiry → inbox → sold → delete; mobile navigation; PWA/offline privacy; responsive sizes; constrained-device behavior; enhanced charts; reduced motion/unsupported WebGL; real catalogue provenance/buying links/themes; lightweight real-model rotation previews; native 3D drag/offscreen suspension; custom electric price/unit consistency.
+- Layout checks cover 320, 360, 390, 768, 1024, 1440 and 2560 px across home, marketplace, affordability, comparison and vehicle detail, with no horizontal overflow or browser JavaScript errors.
+- Constrained-device verification uses 2 GB/2-core/data-saver signals and a 6× CPU throttle. Hardware signals are emulated, not a claim of physical-device benchmark results.
+- Ferrari 458-family and BMW M3 E30 assets rendered through React Three Fiber/Three.js in software WebGL with no runtime errors. Eight rotation previews were generated from each actual asset. Visual inspection confirmed recognisable real-car geometry. The Ferrari source is labelled broadly as an open-roof artist model: it is not attached to an Italia coupe listing.
+- Toyota Corolla Cross model metadata and CC BY licence were verified, but its embedded viewer failed. It is an external source link and attributed preview; no working embedded integration is claimed.
+- Licensed vendor decoder files are unmodified and excluded from lint/format. Source code remains checked. Attribution is in `public/models/CREDITS.md`.
 
-## Production evidence
+## Data provenance
 
-Vercel project `nou2` is linked to `thembaxx/nou2` with production branch `main`.
-The application deployment reached READY and assigned `nou2.vercel.app`.
-Three public Playwright journeys passed on the HTTPS production origin: buyer discovery/calculators/comparison/garage, mobile navigation and installable PWA/offline fallback.
-Public route checks returned 200 for the home page, marketplace, affordability, compare, illustrative vehicle detail, sign-in, manifest, robots, sitemap and llms.txt. Sitemap uses the canonical production origin.
-No error/fatal runtime logs were returned in the checked ten-minute window. This is a deployment check, not ongoing monitoring.
+44 Toyota variants across ten official South African model pages were observed on 13 October 2026. The snapshot retains exact source records; the app supplies source links, observation dates and reference-price labels. Model year and stock are not invented. Missing Hiace consumption is disclosed. Charge-dependent PHEV lab figures are not treated as complete running costs. See `docs/catalogue.md`.
 
-## Outstanding production dependency
+## Production dependency and verification
 
-At verification time, neither the earlier `carpur` setup project nor the Git-connected `nou2` project had `DATABASE_URL`. `/api/health` correctly returned 503 with database/accounts false. Account creation, seller publishing and enquiry delivery were therefore **not verified on production** and remain unavailable there. The user is connecting a new Neon database; no existing unrelated database was reused and no fictitious live inventory was seeded.
+Before this update, Vercel `nou2` was linked to `thembaxx/nou2` on `main`, with the public canonical origin above. The project environment metadata still contained no `DATABASE_URL`; `/api/health` returned 503 with database/accounts false. Hosted accounts, publishing and enquiries remain unavailable until Neon is connected to **nou2**, the migrations are applied and the hosted lifecycle is verified.
 
-After connecting Neon to `nou2`, apply the checked migrations, redeploy and run the hosted account/listing/enquiry journey against an isolated verification branch. Keep production and preview databases separate. The included HTTP migration script supports executors whose outbound access is HTTPS-only.
+The final delivery records the pushed SHA, deployment state and post-deployment public checks. Local seller tests use only the isolated database. No QA inventory is inserted in production.
 
-Email notifications, email verification/recovery, seller verification, external inventory/finance/insurance/credit-bureau feeds, payments, moderation tooling and dealership team seats remain unimplemented. See README and `/sources` for modelling and operational limits.
+## Remaining limitations
 
-## Tooling dependency repair
+Catalogue coverage is currently Toyota; all makes are accepted in seller workflows, but there is no complete-market or verified live-stock feed. Native 3D coverage is two artist assets, not every vehicle or exact factory trim. Unmatched cars use photographs. Manufacturer photography depends on its external CDN. Loan rates, energy prices, insurance, maintenance and depreciation remain editable planning assumptions, not live quotes. Stress scenarios are examples of uncertainty, not probabilities.
 
-GitHub's push-time scanner reported affected development-tool dependencies. Vitest was updated to 5.0.4, Oxfmt to 0.73.0, and Prisma's development-only `deepmerge-ts` dependency was overridden to the patched 8.0.0 release. A fresh `pnpm audit` reported zero vulnerabilities. TypeScript, Oxlint, Oxfmt, all 32 unit tests, Prisma generation and the production build passed with these versions.
+Automated email, account recovery/verification emails, seller verification, lender/insurer/credit-bureau feeds, vehicle history, payments, moderation tooling and dealership team seats remain unimplemented. Inventory is capped at 200 published rows; pagination and production object storage are pending. See README and `/sources`.

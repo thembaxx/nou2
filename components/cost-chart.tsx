@@ -1,11 +1,14 @@
 "use client";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { useDevicePreferences } from "./device-preferences";
 import { zar } from "@/lib/finance";
 export default function CostChart({
   data,
 }: {
   data: { horizon: string; cost: number; second?: number }[];
 }) {
+  const { reducedMotion, mode } = useDevicePreferences();
+  const animate = !reducedMotion && mode !== "reduced";
   return (
     <div
       className="h-64 w-full min-w-0"
@@ -21,9 +24,21 @@ export default function CostChart({
             formatter={(v) => zar(Number(v))}
             contentStyle={{ background: "#151b25", border: "1px solid #44516b", color: "white" }}
           />
-          <Bar dataKey="cost" name="Vehicle 1" fill="#3679ff" isAnimationActive={false} />
+          <Bar
+            dataKey="cost"
+            name="Vehicle 1"
+            fill="#3679ff"
+            isAnimationActive={animate}
+            animationDuration={450}
+          />
           {data.some((v) => v.second !== undefined) && (
-            <Bar dataKey="second" name="Vehicle 2" fill="#a8c9ff" isAnimationActive={false} />
+            <Bar
+              dataKey="second"
+              name="Vehicle 2"
+              fill="#a8c9ff"
+              isAnimationActive={animate}
+              animationDuration={450}
+            />
           )}
         </BarChart>
       </ResponsiveContainer>

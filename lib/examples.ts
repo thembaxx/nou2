@@ -2,6 +2,7 @@ import type { Vehicle } from "./types";
 // Illustrative prices and specifications. Never seed these into the live database.
 export const examples: Vehicle[] = [
   {
+    condition: "USED",
     id: "example-bmw",
     name: "BMW 320i M Sport",
     make: "BMW",
@@ -22,6 +23,7 @@ export const examples: Vehicle[] = [
     example: true,
   },
   {
+    condition: "USED",
     id: "example-mercedes",
     name: "Mercedes-Benz C-Class",
     make: "Mercedes-Benz",
@@ -42,6 +44,7 @@ export const examples: Vehicle[] = [
     example: true,
   },
   {
+    condition: "USED",
     id: "example-golf",
     name: "Volkswagen Golf GTI",
     make: "Volkswagen",
@@ -62,6 +65,7 @@ export const examples: Vehicle[] = [
     example: true,
   },
   {
+    condition: "USED",
     id: "example-toyota",
     name: "Toyota Corolla Cross",
     make: "Toyota",

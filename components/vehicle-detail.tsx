@@ -1,7 +1,10 @@
 "use client";
+import { ResponsivePhoto } from "./responsive-photo";
 import { PhotoCredit } from "./photo-credit";
-import { Component, useState } from "react";
-import dynamic from "next/dynamic";
+import { useState } from "react";
+import { VehicleExplorer } from "./vehicle-explorer";
+import { matchingRealModel } from "@/lib/real-models";
+import { energyUnit } from "@/lib/vehicle-options";
 import Link from "next/link";
 import type { Vehicle } from "@/lib/types";
 import { zar } from "@/lib/finance";
@@ -9,28 +12,9 @@ import { SaveButton } from "./vehicle-card";
 import { Button } from "./ui/button";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "./ui/dialog";
 import { useGarage } from "./providers";
-const Vehicle3D = dynamic(() => import("./vehicle-3d"), {
-  ssr: false,
-  loading: () => <p className="p-8">Loading schematic…</p>,
-});
-class SceneBoundary extends Component<{ children: React.ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  render() {
-    return this.state.failed ? (
-      <p className="notice">
-        3D is unavailable on this device. All vehicle information is available above.
-      </p>
-    ) : (
-      this.props.children
-    );
-  }
-}
 export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
+  const matchedModel = matchingRealModel(v);
   const [photo, setPhoto] = useState(0);
-  const [scene, setScene] = useState(false);
   const [message, setMessage] = useState("");
   const [consent, setConsent] = useState(false);
   const [pending, setPending] = useState(false);
@@ -40,9 +24,11 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
     <>
       <div className="grid gap-8 lg:grid-cols-[1.35fr_.65fr]">
         <div>
-          <img
-            className="aspect-[16/10] w-full object-cover"
+          <ResponsivePhoto
+            className="gallery-photo aspect-[16/10] w-full object-cover"
             src={v.images[photo]}
+            sizes="(min-width: 1024px) 65vw, 100vw"
+            loading="eager"
             alt={
               v.example
                 ? `Editorial photograph for ${v.name} example`
@@ -52,7 +38,7 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
             height={750}
             fetchPriority="high"
           />
-          <div className="mt-3 flex gap-3 overflow-x-auto">
+          <div className="gallery-strip mt-3 flex gap-3 overflow-x-auto">
             {v.images.map((url, i) => (
               <button
                 key={i}
@@ -61,7 +47,14 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
                 aria-pressed={photo === i}
                 className={`shrink-0 border-2 ${photo === i ? "border-blue-400" : "border-transparent"}`}
               >
-                <img width={100} height={70} src={url} alt="" className="h-16 w-24 object-cover" />
+                <ResponsivePhoto
+                  width={100}
+                  height={70}
+                  src={url}
+                  sizes="100px"
+                  alt=""
+                  className="gallery-thumbnail h-16 w-24 object-cover"
+                />
               </button>
             ))}
           </div>
@@ -72,25 +65,38 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
             </p>
           )}
         </div>
-        <div className="panel p-7">
+        <div className="panel p-5 sm:p-7">
           <p className="eyebrow mb-5">
-            {v.example
-              ? "Illustrative vehicle"
-              : v.sellerType === "DEALER"
-                ? "Dealership listing"
-                : "Private listing"}
+            {v.reference
+              ? "New Car / Manufacturer Reference"
+              : v.example
+                ? "Illustrative vehicle"
+                : v.sellerType === "DEALER"
+                  ? "Dealership listing"
+                  : "Private listing"}
           </p>
-          <h1 className="text-4xl font-bold tracking-tight">{v.name}</h1>
-          <p className="mt-6 text-4xl font-bold">{zar(v.price)}</p>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{v.name}</h1>
+          <p className="mt-6 text-xs text-slate-400">
+            {v.reference ? "Manufacturer Reference Price" : "Asking Price"}
+          </p>
+          <p className="mt-1 text-4xl font-bold">{zar(v.price)}</p>
           <p className="mt-3 text-sm text-slate-400">
-            {v.year} · {v.km.toLocaleString("en-ZA")} km · {v.location}
+            {v.reference
+              ? "New Model · Confirm Stock With Dealer"
+              : `${v.condition === "NEW" ? "New" : "Used"} · ${v.year} · ${v.km.toLocaleString("en-ZA")} km`}{" "}
+            · {v.location}
           </p>
           <dl className="mt-7 grid grid-cols-2 gap-5 border-t border-white/15 pt-6">
             {[
               ["Fuel", v.fuelType],
               ["Transmission", v.transmission],
               ["Body style", v.bodyType],
-              ["Consumption", `${v.fuel} ${v.fuelType === "Electric" ? "kWh" : "L"}/100 km`],
+              [
+                "Consumption",
+                v.reference && !v.reference.consumptionAvailable
+                  ? "Not Published"
+                  : `${v.fuel} ${energyUnit(v.fuelType)}/100 km${v.reference ? " (lab)" : ""}`,
+              ],
             ].map(([label, value]) => (
               <div key={label}>
                 <dt className="text-xs text-slate-400">{label}</dt>
@@ -100,9 +106,11 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
           </dl>
           <p className="mt-7 text-sm font-semibold">{v.sellerName}</p>
           <p className="mt-2 text-xs text-slate-400">
-            {v.example
-              ? "Example seller · no contact available"
-              : "Seller identity and vehicle condition have not been verified by Carpur."}
+            {v.reference
+              ? "Manufacturer data observed 13 October 2026; availability and current quote require dealer confirmation."
+              : v.example
+                ? "Example seller · no contact available"
+                : "Seller identity and vehicle condition have not been verified by Carpur."}
           </p>
           <div className="mt-7 flex items-center gap-3">
             <SaveButton id={v.id} className="border border-white/30" />
@@ -113,7 +121,27 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
               {error}
             </p>
           )}
-          {v.example ? (
+          {v.reference ? (
+            <div className="mt-6">
+              <Button className="w-full" asChild>
+                <a href={v.reference.url} target="_blank" rel="noreferrer">
+                  Request A Dealer Quote ↗
+                </a>
+              </Button>
+              <p className="mt-3 text-xs leading-relaxed text-slate-400">
+                Continue to Toyota South Africa’s model page for buying options and its dealer
+                network. Carpur does not submit an enquiry or reserve stock.
+              </p>
+              <a
+                className="mt-3 inline-flex min-h-11 items-center text-xs text-blue-200 underline"
+                href={v.reference.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                View Original Price & Specifications
+              </a>
+            </div>
+          ) : v.example ? (
             <p className="notice mt-6">
               This example is not for sale and cannot receive enquiries.
             </p>
@@ -207,21 +235,28 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
           </p>
         )}
       </section>
-      <details className="panel mb-12 p-6">
-        <summary className="cursor-pointer font-semibold">Explore a 3D vehicle schematic</summary>
-        <p className="my-4 text-sm text-slate-400">
-          Optional interactive view. Load it when you want to explore; no automatic rotation.
-        </p>
-        {scene ? (
-          <SceneBoundary>
-            <Vehicle3D />
-          </SceneBoundary>
-        ) : (
-          <Button variant="outline" onClick={() => setScene(true)}>
-            Load 3D schematic
-          </Button>
-        )}
-      </details>
+      {matchedModel ? (
+        <details className="mb-12">
+          <summary className="mb-4 cursor-pointer text-xl font-semibold">
+            Explore This Model In 3D
+          </summary>
+          <VehicleExplorer initialModelId={matchedModel} />
+        </details>
+      ) : (
+        <section className="notice mb-12">
+          <h2 className="text-lg font-semibold">Photography Of This Model</h2>
+          <p className="mt-2">
+            A verified matching 3D asset is not available for this exact vehicle or trim. Use the
+            photographs above and confirm condition and specifications with the seller or dealer.
+          </p>
+          <Link
+            className="mt-3 inline-flex min-h-11 items-center text-blue-200 underline"
+            href="/#real-car-studio"
+          >
+            Explore Real-Car 3D Models
+          </Link>
+        </section>
+      )}
     </>
   );
 }

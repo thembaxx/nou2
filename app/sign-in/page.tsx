@@ -7,9 +7,9 @@ export default function Page() {
     <div className="page !max-w-xl">
       <p className="eyebrow mb-4">Your Carpur</p>
       <h1 className="page-title mb-8">
-        LET’S GET
+        Let’s Get
         <br />
-        YOU MOVING.
+        You Moving.
       </h1>
       <AuthForm available={authConfigured()} />
       <Link href="/privacy" className="mt-6 inline-block text-sm text-blue-300">

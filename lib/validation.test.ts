@@ -25,11 +25,23 @@ describe("listing boundaries", () => {
     { images: ["javascript:alert(1)"] },
     { images: ["data:image/svg+xml;base64,PHN2Zz4="] },
     { sellerType: "VERIFIED" },
+    { condition: "CERTIFIED_NEW" },
     { year: 1800 },
     { description: "short" },
   ])("rejects invalid listing %#", (input) =>
     expect(listingSchema.safeParse({ ...valid, ...input }).success).toBe(false),
   );
+  it("supports new vehicles and uncommon makes without implying verification", () => {
+    const parsed = listingSchema.safeParse({
+      ...valid,
+      condition: "NEW",
+      make: "An Independent Make",
+      fuelType: "Electric",
+      bodyType: "Van",
+      fuel: 22,
+    });
+    expect(parsed.success).toBe(true);
+  });
   it("requires contact-sharing consent for enquiries", () =>
     expect(
       enquirySchema.safeParse({ message: "Is this vehicle available?", consent: false }).success,

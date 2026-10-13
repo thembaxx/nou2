@@ -17,7 +17,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
   return (
     <div className="page !max-w-5xl">
       <p className="eyebrow mb-4">Private sellers & dealerships</p>
-      <h1 className="page-title mb-5">{listing ? "TELL YOUR STORY." : "YOUR NEXT CHAPTER."}</h1>
+      <h1 className="page-title mb-5">{listing ? "Tell Your Story." : "Your Next Chapter."}</h1>
       <p className="mb-10 text-slate-400">
         Create a clear, honest listing. Add your photographs and connect with buyers.
       </p>

@@ -7,6 +7,7 @@ export type FinanceInput = {
   distanceKm: number;
   litresPer100Km: number;
   fuelPrice: number;
+  chargingMonthly?: number;
   insuranceMonthly: number;
   maintenanceMonthly: number;
   depreciationAnnual: number;
@@ -57,9 +58,11 @@ export function forecast(x: FinanceInput, years = 3) {
   ] as const)
     finiteNonNegative(x[key], key);
   if (x.depreciationAnnual > 100) throw new RangeError("Depreciation cannot exceed 100%");
+  finiteNonNegative(x.chargingMonthly ?? 0, "chargingMonthly");
   const balloon = x.balloon ?? 0;
   const instalment = monthlyPayment(x.price, x.deposit, x.annualRate, x.months, balloon);
-  const fuel = (((x.distanceKm * x.litresPer100Km) / 100) * x.fuelPrice) / 12;
+  const fuel =
+    (((x.distanceKm * x.litresPer100Km) / 100) * x.fuelPrice) / 12 + (x.chargingMonthly ?? 0);
   const runningMonthly = fuel + x.insuranceMonthly + x.maintenanceMonthly;
   const horizonMonths = Math.round(years * 12);
   const paidMonths = Math.min(horizonMonths, x.months);

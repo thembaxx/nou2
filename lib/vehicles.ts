@@ -2,10 +2,12 @@ import "server-only";
 import { databaseConfigured, getDb } from "./db";
 import type { Vehicle } from "./types";
 import { examples } from "./examples";
+import { catalogue } from "./catalogue";
 import type { Listing } from "@prisma/client";
 export function publicVehicle(row: Listing): Vehicle {
   return {
     id: row.id,
+    condition: row.condition === "NEW" ? "NEW" : "USED",
     name: row.name,
     make: row.make,
     year: row.year,
@@ -29,7 +31,7 @@ export async function inventory() {
   try {
     const rows = await getDb().listing.findMany({
       where: { status: "PUBLISHED" },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ condition: "asc" }, { createdAt: "desc" }],
       take: 200,
     });
     return { vehicles: rows.map(publicVehicle), available: true };
@@ -38,7 +40,7 @@ export async function inventory() {
   }
 }
 export async function vehicleById(id: string) {
-  const example = examples.find((v) => v.id === id);
+  const example = [...catalogue, ...examples].find((v) => v.id === id);
   if (example) return example;
   if (!databaseConfigured()) return null;
   try {

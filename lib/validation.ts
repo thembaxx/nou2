@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BODY_TYPES, FUEL_TYPES, TRANSMISSIONS } from "./vehicle-options";
 const photo = z
   .string()
   .max(260000)
@@ -12,6 +13,7 @@ const photo = z
     }
   }, "Use an HTTPS image URL or a compressed JPEG, PNG or WebP photo");
 export const listingSchema = z.object({
+  condition: z.enum(["NEW", "USED"]).default("USED"),
   name: z.string().trim().min(3).max(100),
   make: z.string().trim().min(2).max(50),
   year: z
@@ -21,10 +23,10 @@ export const listingSchema = z.object({
     .max(new Date().getFullYear() + 1),
   price: z.number().int().min(1000).max(10000000),
   km: z.number().int().min(0).max(2000000),
-  fuel: z.number().min(0).max(40),
-  fuelType: z.enum(["Petrol", "Diesel", "Hybrid", "Electric"]),
-  transmission: z.enum(["Automatic", "Manual"]),
-  bodyType: z.enum(["Sedan", "Hatchback", "SUV", "Bakkie", "Coupe", "Other"]),
+  fuel: z.number().min(0).max(100),
+  fuelType: z.enum(FUEL_TYPES),
+  transmission: z.enum(TRANSMISSIONS),
+  bodyType: z.enum(BODY_TYPES),
   images: z
     .array(photo)
     .min(1)
