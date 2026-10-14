@@ -57,7 +57,9 @@ test("private and dealership listing lifecycle, ownership controls and inbox del
       .fill(
         "Internal verification fixture. This is not a vehicle offered for sale. This listing will be removed immediately after testing.",
       );
-    await sp.getByLabel("Upload photos").setInputFiles("public/images/bmw.webp");
+    await sp
+      .getByLabel("Upload photos")
+      .setInputFiles(["public/images/bmw-1600.webp", "public/images/mercedes-1600.webp"]);
     await expect(sp.getByRole("button", { name: /Remove photo 1/i })).toBeVisible();
     await sp.getByRole("button", { name: /Save as draft/i, exact: true }).click();
     await expect(sp).toHaveURL(/dashboard/);
@@ -89,6 +91,21 @@ test("private and dealership listing lifecycle, ownership controls and inbox del
       expect(blocked.status()).toBe(404);
       await bp.goto(`/vehicles/${listingId}`);
       await expect(bp.getByText("Dealership listing")).toBeVisible();
+      await bp.getByRole("button", { name: "Open full-screen photos" }).click();
+      const inspected = bp.locator(".inspection-photo");
+      const firstPhoto = await inspected.getAttribute("src");
+      await bp.getByRole("button", { name: "Next photo", exact: true }).click();
+      await expect(inspected).not.toHaveAttribute("src", firstPhoto!);
+      await bp.keyboard.press("ArrowLeft");
+      await expect(inspected).toHaveAttribute("src", firstPhoto!);
+      const frame = (await bp.getByLabel("Photo inspection area").boundingBox())!;
+      await bp.mouse.move(frame.x + frame.width * 0.7, frame.y + frame.height / 2);
+      await bp.mouse.down();
+      await bp.mouse.move(frame.x + frame.width * 0.3, frame.y + frame.height / 2, { steps: 5 });
+      await bp.mouse.up();
+      await expect(inspected).not.toHaveAttribute("src", firstPhoto!);
+      await bp.keyboard.press("Escape");
+      await expect(bp.getByRole("button", { name: "Open full-screen photos" })).toBeFocused();
       await bp.getByRole("button", { name: /Save to garage/i }).click();
       await expect(bp.getByRole("button", { name: /Remove from garage/i })).toHaveAttribute(
         "aria-pressed",

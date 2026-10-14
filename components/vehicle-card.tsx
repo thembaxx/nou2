@@ -31,16 +31,16 @@ export function SaveButton({ id, className = "" }: { id: string; className?: str
 }
 export function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
   return (
-    <article className="panel vehicle-card group overflow-hidden">
+    <article className="panel vehicle-card group overflow-hidden" data-reveal-item>
       <div className="relative overflow-hidden">
         <Link href={`/vehicles/${v.id}`} tabIndex={-1} aria-hidden="true">
           <ResponsivePhoto
             src={v.images[0]}
-            sizes="(min-width: 1400px) 320px, (min-width: 640px) 45vw, 100vw"
+            sizes="(min-width: 1760px) 320px, (min-width: 1200px) 25vw, (min-width: 640px) 45vw, 100vw"
             alt={v.example ? `Editorial photograph for ${v.name} example` : v.name}
             width={800}
             height={500}
-            className="car-photo"
+            className={`car-photo ${v.reference ? "manufacturer-photo" : ""}`}
             loading="lazy"
           />
         </Link>

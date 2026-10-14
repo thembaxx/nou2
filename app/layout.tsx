@@ -43,6 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang="en-ZA"
+      data-scroll-behavior="smooth"
       data-visual-tier={initialSaveData ? "reduced" : "standard"}
       data-motion="light"
       suppressHydrationWarning

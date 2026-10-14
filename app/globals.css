@@ -522,8 +522,20 @@ footer {
   width: 100%;
   margin-bottom: 1.5rem;
 }
-.reveal-light {
+.reveal-light:not(.vehicle-grid) {
   animation: light-reveal 0.45s ease-out both;
+}
+.vehicle-grid.reveal-light > :nth-child(-n + 8) {
+  animation: light-reveal 0.45s ease-out both;
+}
+.vehicle-grid.reveal-light > :nth-child(2) {
+  animation-delay: 40ms;
+}
+.vehicle-grid.reveal-light > :nth-child(3) {
+  animation-delay: 80ms;
+}
+.vehicle-grid.reveal-light > :nth-child(4) {
+  animation-delay: 120ms;
 }
 @keyframes light-reveal {
   from {
@@ -719,4 +731,167 @@ footer {
 .colour-option:disabled {
   opacity: 0.5;
   cursor: default;
+}
+.manufacturer-photo {
+  object-fit: contain;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  background: radial-gradient(ellipse at 50% 85%, #223048, #111925 70%);
+}
+:root[data-theme="light"] .manufacturer-photo {
+  background: radial-gradient(ellipse at 50% 85%, #d7e3f3, #f4f7fc 70%);
+}
+.gallery-open {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background: #111925;
+}
+.gallery-open img {
+  display: block;
+}
+.gallery-expand,
+.gallery-count {
+  position: absolute;
+  bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.75rem;
+  background: #090f1dea;
+  color: #edf4ff;
+  font-size: 12px;
+}
+.gallery-expand {
+  left: 1rem;
+}
+.gallery-count {
+  right: 1rem;
+}
+.dialog-content.photo-dialog {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(1700px, calc(100vw - 16px));
+  max-width: none;
+  height: calc(100dvh - 24px);
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 1.25rem;
+}
+.photo-dialog-heading {
+  padding: 1rem 1rem 0.75rem;
+}
+.photo-dialog-footer {
+  padding: 0.75rem 1rem 1rem;
+}
+.photo-dialog-footer .gallery-strip img {
+  height: 44px;
+  width: 64px;
+}
+.photo-inspection-stage {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: #0b111c;
+  touch-action: none;
+  user-select: none;
+  cursor: zoom-in;
+}
+:root[data-theme="light"] .photo-inspection-stage {
+  background: #edf2fa;
+}
+.photo-inspection-stage:not([data-zoom="1.00"]) {
+  cursor: grab;
+}
+.photo-inspection-stage:not([data-zoom="1.00"]):active {
+  cursor: grabbing;
+}
+.photo-pan {
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+}
+.inspection-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.photo-error {
+  position: absolute;
+  inset: 30% 1rem auto;
+  text-align: center;
+  padding: 1rem;
+  background: #151e2e;
+  color: #edf4ff;
+}
+:root:not([data-motion="reduced"]) .photo-transition {
+  animation: photo-arrive 0.25s ease-out;
+}
+:root:not([data-motion="reduced"]) .save-button svg {
+  transition:
+    fill 0.2s ease,
+    transform 0.2s ease;
+}
+:root:not([data-motion="reduced"]) .save-button[aria-pressed="true"] svg {
+  animation: save-pulse 0.4s ease-out;
+}
+:root:not([data-motion="reduced"]) .save-button:active,
+:root:not([data-motion="reduced"]) .squircle-button:active {
+  transform: scale(0.96);
+}
+:root[data-motion="full"] .vehicle-card {
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease;
+}
+:root[data-motion="full"] .vehicle-card:focus-within {
+  border-color: #719bde;
+}
+@media (hover: hover) and (pointer: fine) {
+  :root[data-motion="full"] .vehicle-card:hover {
+    transform: translateY(-5px);
+    border-color: #577294;
+  }
+  :root[data-motion="full"] .gallery-expand {
+    transition: transform 0.3s ease;
+  }
+  :root[data-motion="full"] .gallery-open:hover .gallery-expand {
+    transform: translateY(-3px);
+  }
+}
+:root[data-motion="full"] .technology-card:focus-within .piston {
+  animation: piston-stroke 0.8s ease-in-out 3;
+}
+:root[data-motion="full"] .technology-card:focus-within .battery-cell {
+  animation: cell-charge 1.4s ease-in-out 2;
+}
+@keyframes photo-arrive {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes save-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.3);
+  }
+}
+@media (min-width: 640px) {
+  .photo-dialog-heading {
+    padding: 1.25rem 1.5rem 1rem;
+  }
+  .photo-dialog-footer {
+    padding: 1rem 1.5rem 1.25rem;
+  }
 }

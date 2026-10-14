@@ -9,20 +9,25 @@ async function compressPhoto(file: File, maxEdge: number): Promise<string> {
   if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 10000000)
     throw new Error("Use JPEG, PNG or WebP images under 10 MB.");
   const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  const context = canvas.getContext("2d");
-  if (!context)
-    throw new Error("Photo processing is unavailable in this browser. Use an HTTPS image URL.");
-  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  let data = canvas.toDataURL("image/webp", 0.75);
-  if (data.length > 250000) data = canvas.toDataURL("image/webp", 0.4);
-  if (data.length > 250000)
+  try {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    if (!context)
+      throw new Error("Photo processing is unavailable in this browser. Use an HTTPS image URL.");
+    for (const edge of [maxEdge, Math.round(maxEdge * 0.75)]) {
+      const scale = Math.min(1, edge / Math.max(bitmap.width, bitmap.height));
+      canvas.width = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(bitmap.height * scale);
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      for (const quality of [0.88, 0.8, 0.72]) {
+        const data = canvas.toDataURL("image/webp", quality);
+        if (data.length <= 250000) return data;
+      }
+    }
     throw new Error("This photograph is too detailed. Try a smaller image.");
-  return data;
+  } finally {
+    bitmap.close();
+  }
 }
 export function ListingForm({ initial }: { initial?: Vehicle }) {
   const { tier } = useDevicePreferences();
@@ -209,7 +214,7 @@ export function ListingForm({ initial }: { initial?: Vehicle }) {
                 if (form.images.length + files.length > 6)
                   throw new Error("Use a maximum of 6 photos.");
                 const photos: string[] = [];
-                const maxEdge = tier === "reduced" ? 960 : tier === "enhanced" ? 1600 : 1200;
+                const maxEdge = tier === "reduced" ? 1200 : tier === "enhanced" ? 2400 : 1600;
                 for (const file of files) photos.push(await compressPhoto(file, maxEdge));
                 if ([...form.images, ...photos].join("").length > 1000000)
                   throw new Error(

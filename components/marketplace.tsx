@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BODY_TYPES, FUEL_TYPES } from "@/lib/vehicle-options";
 import type { Vehicle } from "@/lib/types";
 import { VehicleCard } from "./vehicle-card";
+import { Reveal } from "./reveal";
 import { useGarage } from "./providers";
 import { Button } from "./ui/button";
 export function Marketplace({
@@ -186,11 +187,11 @@ export function Marketplace({
           {error}
         </p>
       )}
-      <div className="vehicle-grid">
+      <Reveal className="vehicle-grid">
         {visible.map((v) => (
           <VehicleCard key={v.id} vehicle={v} />
         ))}
-      </div>
+      </Reveal>
       {visible.length === 0 && (
         <div className="panel p-10 text-center">
           <h2 className="mb-3 text-2xl font-semibold">

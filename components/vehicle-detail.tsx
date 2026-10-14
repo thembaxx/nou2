@@ -1,6 +1,5 @@
 "use client";
-import { ResponsivePhoto } from "./responsive-photo";
-import { PhotoCredit } from "./photo-credit";
+import { VehicleGallery } from "./vehicle-gallery";
 import { useState } from "react";
 import { VehicleExplorer } from "./vehicle-explorer";
 import { matchingRealModel } from "@/lib/real-models";
@@ -14,7 +13,6 @@ import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } 
 import { useGarage } from "./providers";
 export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
   const matchedModel = matchingRealModel(v);
-  const [photo, setPhoto] = useState(0);
   const [message, setMessage] = useState("");
   const [consent, setConsent] = useState(false);
   const [pending, setPending] = useState(false);
@@ -23,48 +21,7 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
   return (
     <>
       <div className="grid gap-8 lg:grid-cols-[1.35fr_.65fr]">
-        <div>
-          <ResponsivePhoto
-            className="gallery-photo aspect-[16/10] w-full object-cover"
-            src={v.images[photo]}
-            sizes="(min-width: 1024px) 65vw, 100vw"
-            loading="eager"
-            alt={
-              v.example
-                ? `Editorial photograph for ${v.name} example`
-                : `${v.name}, photo ${photo + 1}`
-            }
-            width={1200}
-            height={750}
-            fetchPriority="high"
-          />
-          <div className="gallery-strip mt-3 flex gap-3 overflow-x-auto">
-            {v.images.map((url, i) => (
-              <button
-                key={i}
-                onClick={() => setPhoto(i)}
-                aria-label={`View photo ${i + 1}`}
-                aria-pressed={photo === i}
-                className={`shrink-0 border-2 ${photo === i ? "border-blue-400" : "border-transparent"}`}
-              >
-                <ResponsivePhoto
-                  width={100}
-                  height={70}
-                  src={url}
-                  sizes="100px"
-                  alt=""
-                  className="gallery-thumbnail h-16 w-24 object-cover"
-                />
-              </button>
-            ))}
-          </div>
-          <PhotoCredit id={v.id} />
-          {v.example && (
-            <p className="mt-4 text-xs text-slate-400">
-              Editorial photography. Model, trim and condition are not verified.
-            </p>
-          )}
-        </div>
+        <VehicleGallery vehicle={v} />
         <div className="panel p-5 sm:p-7">
           <p className="eyebrow mb-5">
             {v.reference

@@ -1,33 +1,53 @@
 "use client";
-import type { ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
+import Image from "next/image";
 import { useDevicePreferences } from "./device-preferences";
 export function ResponsivePhoto({
   src,
   sizes = "100vw",
   loading = "lazy",
   decoding = "async",
+  inspection = false,
   ...props
-}: ComponentProps<"img"> & { src: string }) {
-  const { tier } = useDevicePreferences();
+}: ComponentProps<"img"> & { src: string; inspection?: boolean }) {
+  const { saveData, mode } = useDevicePreferences();
+  const [unoptimised, setUnoptimised] = useState("");
   const match = src.match(/^\/images\/(hero|bmw|mercedes|golf|toyota)\.webp$/);
   const name = match?.[1];
-  const manufacturer = src.startsWith("https://assets.cdntoyota.co.za/");
-  const adaptiveSource =
-    manufacturer && tier === "reduced"
-      ? src.replace(".mobile.png", ".thumbnail.png")
-      : manufacturer && tier === "enhanced"
-        ? src.replace(".mobile.png", ".desktop.png")
-        : src;
+  const manufacturer = src.startsWith("https://assets.cdntoyota.co.za/toyotacms23/attachments/");
+  // Image resolution follows the rendered size and pixel density, not CPU/GPU power.
+  // Only public manufacturer imagery is optimised; authenticated seller photos stay private.
+  const original = manufacturer ? src.replace(/\.(mobile|thumbnail)\.png$/, ".desktop.png") : src;
+  if (manufacturer && unoptimised !== src) {
+    return (
+      <Image
+        {...props}
+        src={original}
+        alt={props.alt || ""}
+        width={Number(props.width) || 1200}
+        height={Number(props.height) || 750}
+        sizes={sizes}
+        quality={inspection ? 90 : saveData || mode === "reduced" ? 65 : 85}
+        loading={loading}
+        decoding={decoding}
+        onError={() => setUnoptimised(src)}
+      />
+    );
+  }
   const widths =
-    tier === "reduced"
+    saveData && !inspection
       ? [320, 640]
       : name === "hero"
         ? [320, 640, 960, 1600, 2560]
-        : [320, 640, 960, 1600];
+        : inspection
+          ? name === "golf"
+            ? [640, 960, 1600, 2400]
+            : [640, 960, 1600, 2400, 3200]
+          : [320, 640, 960, 1600, 2400];
   return (
     <img
       {...props}
-      src={adaptiveSource}
+      src={original}
       sizes={name ? sizes : undefined}
       srcSet={
         name

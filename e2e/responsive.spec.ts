@@ -145,8 +145,16 @@ test("lightweight real-model previews rotate without loading WebGL", async ({ pa
   await expect(preview).not.toHaveAttribute("src", before!);
   await expect(page.locator("canvas")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "View Interior" })).toBeDisabled();
+  await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await expect(preview).not.toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
+  await page.getByRole("button", { name: "Side Profile", exact: true }).click();
+  await expect(page.getByLabel("Rotate model", { exact: true })).toHaveValue("-0.79");
+  await page.getByRole("button", { name: "Reset view", exact: true }).click();
+  await expect(page.getByLabel("Rotate model", { exact: true })).toHaveValue("0.35");
 });
 test("enhanced 3D renders, responds to drag and suspends while offscreen", async ({ page }) => {
+  // This journey loads and remounts the actual GLB, and exercises multiple poses in software WebGL.
+  test.setTimeout(180000);
   await mockHardware(page, 16, 16);
   await page.setViewportSize({ width: 1440, height: 1100 });
   await page.goto("/");
@@ -161,6 +169,16 @@ test("enhanced 3D renders, responds to drag and suspends while offscreen", async
   await page.mouse.move(box!.x + box!.width / 2 + 70, box!.y + box!.height / 2, { steps: 5 });
   await page.mouse.up();
   expect(await slider.inputValue()).not.toBe(before);
+  await page.getByRole("button", { name: "Side Profile", exact: true }).click();
+  await expect(slider).toHaveValue("-0.79");
+  await page.getByRole("button", { name: "Auto Rotate", exact: true }).click();
+  await expect
+    .poll(async () => Math.abs(Number(await slider.inputValue()) + 0.79))
+    .toBeGreaterThan(0.03);
+  await page.getByRole("button", { name: "Pause Motion", exact: true }).click();
+  const pausedAngle = Number(await slider.inputValue());
+  await page.waitForTimeout(250);
+  expect(Math.abs(Number(await slider.inputValue()) - pausedAngle)).toBeLessThan(0.1);
   await page.getByRole("button", { name: "View Interior" }).click();
   await expect(page.getByRole("button", { name: "Exterior View" })).toHaveAttribute(
     "aria-pressed",

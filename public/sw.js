@@ -1,4 +1,4 @@
-const CACHE = "carpur-public-assets-v6";
+const CACHE = "carpur-public-assets-v7";
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches

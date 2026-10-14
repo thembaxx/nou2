@@ -84,19 +84,19 @@ export default async function Home() {
             </Link>
           </Button>
         </Reveal>
-        <div className="vehicle-grid">
+        <Reveal className="vehicle-grid">
           {featuredNewCars.map((v) => (
             <VehicleCard key={v.id} vehicle={v} />
           ))}
-        </div>
+        </Reveal>
         {fresh.length > 0 && (
           <>
             <h3 className="mb-5 mt-10 text-2xl font-bold">New Cars From Sellers</h3>
-            <div className="vehicle-grid">
+            <Reveal className="vehicle-grid">
               {fresh.map((v) => (
                 <VehicleCard key={v.id} vehicle={v} />
               ))}
-            </div>
+            </Reveal>
           </>
         )}
       </section>
@@ -119,11 +119,11 @@ export default async function Home() {
             </Button>
           </Reveal>
           {used.length ? (
-            <div className="vehicle-grid">
+            <Reveal className="vehicle-grid">
               {used.map((v) => (
                 <VehicleCard key={v.id} vehicle={v} />
               ))}
-            </div>
+            </Reveal>
           ) : (
             <div className="panel grid gap-6 p-6 md:grid-cols-[1fr_auto]">
               <div>

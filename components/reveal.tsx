@@ -13,7 +13,7 @@ export function Reveal({ children, className }: { children: React.ReactNode; cla
       className={`${className || ""} ${visible && ready && !reducedMotion && mode !== "reduced" && tier !== "enhanced" ? "reveal-light" : ""}`}
     >
       {children}
-      {ready && visible && tier === "enhanced" && !reducedMotion && (
+      {ready && visible && tier === "enhanced" && !reducedMotion && mode !== "reduced" && (
         <OptionalVisualBoundary>
           <MotionReveal target={ref.current} />
         </OptionalVisualBoundary>

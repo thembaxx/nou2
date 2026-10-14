@@ -24,11 +24,12 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
   const [distance, setDistance] = useState(4.7);
   const [interior, setInterior] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const [requested, setRequested] = useState(false);
   const [foreground, setForeground] = useState(true);
   const [webgl, setWebgl] = useState(false);
-  const { tier, mode, ready, reducedMotion } = useDevicePreferences();
+  const { tier, mode, ready, reducedMotion, saveData } = useDevicePreferences();
   const { ref, visible } = useViewportGate({ once: false, margin: "80px" });
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   useEffect(() => {
@@ -49,13 +50,31 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
   useEffect(() => {
     setSceneReady(false);
   }, [active, modelId]);
+  useEffect(() => {
+    if (!visible || !foreground || reducedMotion || !active) {
+      setPlaying(false);
+      setDragging(false);
+      pointers.current.clear();
+    }
+  }, [visible, foreground, reducedMotion, active]);
+  const previewIndex = Math.min(
+    7,
+    Math.floor(((Math.atan2(Math.sin(angle), Math.cos(angle)) + Math.PI) / (2 * Math.PI)) * 8),
+  );
   const poster = (
     <div className="real-model-poster">
       <img
-        src={`/models/${model.id}-view-${Math.min(7, Math.floor(((Math.max(-3.14, Math.min(3.14, angle)) + 3.14) / 6.28) * 8))}.webp`}
+        src={`/models/${model.id}-view-${previewIndex}.webp`}
+        srcSet={
+          saveData
+            ? undefined
+            : `/models/${model.id}-view-${previewIndex}.webp 800w, /models/${model.id}-view-${previewIndex}-1600.webp 1600w`
+        }
+        sizes="(min-width: 1760px) 750px, (min-width: 1024px) 45vw, 100vw"
+        style={{ transform: `scale(${4.7 / distance})` }}
         alt={`${model.name} — rendering of the actual artist model`}
-        width={1000}
-        height={650}
+        width={1600}
+        height={1000}
         loading="eager"
       />
       <span className="text-xs text-slate-300">{model.name} · 360° Model Preview</span>
@@ -81,6 +100,11 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
               setPlaying(false);
               setRequested(false);
               setInterior(false);
+              setAngle(0.35);
+              setDistance(4.7);
+              setElevation(1.8);
+              pointers.current.clear();
+              setDragging(false);
             }}
           >
             {realModels.map((m) => (
@@ -100,6 +124,8 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
           if (model.provider !== "local") return;
           if (e.pointerType === "mouse" && e.button !== 0) return;
           e.currentTarget.setPointerCapture(e.pointerId);
+          setPlaying(false);
+          setDragging(true);
           pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
         }}
         onPointerMove={(e) => {
@@ -111,13 +137,26 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
               after = Math.hypot(e.clientX - other.x, e.clientY - other.y);
             setDistance((v) => Math.max(3.4, Math.min(7, v + (before - after) * 0.012)));
           } else {
-            setAngle((v) => v + (e.clientX - previous.x) * 0.009);
+            setAngle((v) => {
+              const next = v + (e.clientX - previous.x) * 0.009;
+              return Math.atan2(Math.sin(next), Math.cos(next));
+            });
             setElevation((v) => Math.max(1, Math.min(4, v + (e.clientY - previous.y) * 0.009)));
           }
           pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
         }}
-        onPointerUp={(e) => pointers.current.delete(e.pointerId)}
-        onPointerCancel={(e) => pointers.current.delete(e.pointerId)}
+        onPointerUp={(e) => {
+          pointers.current.delete(e.pointerId);
+          setDragging(pointers.current.size > 0);
+        }}
+        onPointerCancel={(e) => {
+          pointers.current.delete(e.pointerId);
+          setDragging(pointers.current.size > 0);
+        }}
+        onLostPointerCapture={(e) => {
+          pointers.current.delete(e.pointerId);
+          setDragging(pointers.current.size > 0);
+        }}
       >
         {model.provider === "local" ? (
           <>
@@ -133,7 +172,9 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
                   colour={colour}
                   interior={interior}
                   animate={playing && !reducedMotion}
+                  dragging={dragging}
                   onReady={() => setSceneReady(true)}
+                  onOrbit={setAngle}
                 />
               </OptionalVisualBoundary>
             ) : (
@@ -189,6 +230,7 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
                   size="icon"
                   aria-label="Reset view"
                   onClick={() => {
+                    setPlaying(false);
                     setAngle(0.35);
                     setDistance(4.7);
                     setElevation(1.8);
@@ -197,6 +239,27 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
                   <RotateCcw size={16} />
                 </Button>
               </div>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2" aria-label="Camera views">
+              {[
+                ["Three Quarter", 0.35],
+                ["Side Profile", model.id === "bmw-m3-e30" ? -0.79 : 0.79],
+                ["Opposite Quarter", -2.8],
+              ].map(([label, viewAngle]) => (
+                <Button
+                  key={label}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setPlaying(false);
+                    setAngle(Number(viewAngle));
+                    setElevation(1.8);
+                    setDistance(4.7);
+                  }}
+                >
+                  {label}
+                </Button>
+              ))}
             </div>
             {!active && ready && (
               <div className="mt-3 text-xs text-slate-400">
@@ -225,7 +288,10 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
                 max={3.14}
                 step={0.01}
                 value={Math.max(-3.14, Math.min(3.14, angle))}
-                onChange={(e) => setAngle(Number(e.target.value))}
+                onChange={(e) => {
+                  setPlaying(false);
+                  setAngle(Number(e.target.value));
+                }}
               />
             </label>
             <div className="my-3 flex flex-wrap items-center justify-between gap-3">
