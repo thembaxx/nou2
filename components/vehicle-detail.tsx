@@ -1,5 +1,6 @@
 "use client";
 import { VehicleGallery } from "./vehicle-gallery";
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import { useState } from "react";
 import { VehicleExplorer } from "./vehicle-explorer";
 import { matchingRealModel } from "@/lib/real-models";
@@ -82,7 +83,8 @@ export function VehicleDetail({ vehicle: v }: { vehicle: Vehicle }) {
             <div className="mt-6">
               <Button className="w-full" asChild>
                 <a href={v.reference.url} target="_blank" rel="noreferrer">
-                  Request A Dealer Quote ↗
+                  Request A Dealer Quote
+                  <ArrowUpRightIcon aria-hidden="true" focusable="false" size={16} />
                 </a>
               </Button>
               <p className="mt-3 text-xs leading-relaxed text-slate-400">

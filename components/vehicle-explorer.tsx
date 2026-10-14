@@ -2,7 +2,10 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { ArrowUpRight, Minus, Plus, RotateCcw } from "lucide-react";
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
+import { MinusIcon } from "@phosphor-icons/react/dist/ssr/Minus";
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
+import { ArrowCounterClockwiseIcon } from "@phosphor-icons/react/dist/ssr/ArrowCounterClockwise";
 import { realModels } from "@/lib/real-models";
 import { useDevicePreferences } from "./device-preferences";
 import { useViewportGate } from "./viewport-gate";
@@ -193,7 +196,8 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
             />
             <Button asChild>
               <a href={model.source} target="_blank" rel="noreferrer">
-                Open Toyota 3D At Source ↗
+                Open Toyota 3D At Source
+                <ArrowUpRightIcon aria-hidden="true" focusable="false" size={16} />
               </a>
             </Button>
             <p className="text-xs text-slate-300">
@@ -215,7 +219,7 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
                   aria-label="Zoom in"
                   onClick={() => setDistance((v) => Math.max(3.4, v - 0.4))}
                 >
-                  <Plus size={16} />
+                  <PlusIcon aria-hidden="true" focusable="false" size={16} />
                 </Button>
                 <Button
                   variant="outline"
@@ -223,7 +227,7 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
                   aria-label="Zoom out"
                   onClick={() => setDistance((v) => Math.min(7, v + 0.4))}
                 >
-                  <Minus size={16} />
+                  <MinusIcon aria-hidden="true" focusable="false" size={16} />
                 </Button>
                 <Button
                   variant="outline"
@@ -236,7 +240,7 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
                     setElevation(1.8);
                   }}
                 >
-                  <RotateCcw size={16} />
+                  <ArrowCounterClockwiseIcon aria-hidden="true" focusable="false" size={16} />
                 </Button>
               </div>
             </div>
@@ -349,7 +353,7 @@ export function VehicleExplorer({ initialModelId = "bmw-m3-e30" }: { initialMode
             href={`/marketplace?${model.make === "Toyota" ? "" : "inventory=sellers&"}q=${encodeURIComponent(model.make === "Toyota" ? "Corolla Cross" : model.make)}`}
           >
             Find {model.make} Cars
-            <ArrowUpRight />
+            <ArrowUpRightIcon aria-hidden="true" focusable="false" />
           </Link>
         </Button>
       </div>

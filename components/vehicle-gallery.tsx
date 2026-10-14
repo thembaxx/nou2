@@ -1,6 +1,11 @@
 "use client";
 import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Expand, Minus, Plus, RotateCcw } from "lucide-react";
+import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
+import { CaretRightIcon } from "@phosphor-icons/react/dist/ssr/CaretRight";
+import { ArrowsOutIcon } from "@phosphor-icons/react/dist/ssr/ArrowsOut";
+import { MinusIcon } from "@phosphor-icons/react/dist/ssr/Minus";
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
+import { ArrowCounterClockwiseIcon } from "@phosphor-icons/react/dist/ssr/ArrowCounterClockwise";
 import type { Vehicle } from "@/lib/types";
 import { ResponsivePhoto } from "./responsive-photo";
 import { PhotoCredit } from "./photo-credit";
@@ -90,7 +95,7 @@ export function VehicleGallery({ vehicle: v }: { vehicle: Vehicle }) {
               className={`gallery-photo aspect-[16/10] w-full ${v.reference ? "manufacturer-photo object-contain" : "object-cover"}`}
             />
             <span className="gallery-expand">
-              <Expand size={16} /> Inspect Photos
+              <ArrowsOutIcon aria-hidden="true" focusable="false" size={16} /> Inspect Photos
             </span>
             <span className="gallery-count">
               {photo + 1} / {v.images.length}
@@ -234,7 +239,7 @@ export function VehicleGallery({ vehicle: v }: { vehicle: Vehicle }) {
                   disabled={v.images.length < 2}
                   onClick={() => choose(photo - 1)}
                 >
-                  <ChevronLeft size={18} />
+                  <CaretLeftIcon aria-hidden="true" focusable="false" size={18} />
                 </Button>
                 <span className="min-w-14 text-center text-xs" aria-live="polite">
                   {photo + 1} / {v.images.length}
@@ -246,7 +251,7 @@ export function VehicleGallery({ vehicle: v }: { vehicle: Vehicle }) {
                   disabled={v.images.length < 2}
                   onClick={() => choose(photo + 1)}
                 >
-                  <ChevronRight size={18} />
+                  <CaretRightIcon aria-hidden="true" focusable="false" size={18} />
                 </Button>
               </div>
               <div className="flex items-center gap-1">
@@ -257,7 +262,7 @@ export function VehicleGallery({ vehicle: v }: { vehicle: Vehicle }) {
                   disabled={view.scale === 1}
                   onClick={() => zoom(-0.5)}
                 >
-                  <Minus size={16} />
+                  <MinusIcon aria-hidden="true" focusable="false" size={16} />
                 </Button>
                 <span className="min-w-11 text-center text-xs">
                   {Math.round(view.scale * 100)}%
@@ -269,7 +274,7 @@ export function VehicleGallery({ vehicle: v }: { vehicle: Vehicle }) {
                   disabled={view.scale === 3}
                   onClick={() => zoom(0.5)}
                 >
-                  <Plus size={16} />
+                  <PlusIcon aria-hidden="true" focusable="false" size={16} />
                 </Button>
                 <Button
                   size="icon"
@@ -277,7 +282,7 @@ export function VehicleGallery({ vehicle: v }: { vehicle: Vehicle }) {
                   aria-label="Reset photo zoom"
                   onClick={() => setView(INITIAL_VIEW)}
                 >
-                  <RotateCcw size={16} />
+                  <ArrowCounterClockwiseIcon aria-hidden="true" focusable="false" size={16} />
                 </Button>
               </div>
             </div>

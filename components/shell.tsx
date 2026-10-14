@@ -3,7 +3,9 @@ import Link from "next/link";
 import { ThemeToggle, ThemePreferenceControl } from "./theme-preferences";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
+import { ListIcon } from "@phosphor-icons/react/dist/ssr/List";
+import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
 import { Button } from "./ui/button";
 import { useGarage } from "./providers";
 import { VisualPreferenceControl, useDevicePreferences } from "./device-preferences";
@@ -50,7 +52,7 @@ export function Header() {
             <Link href="/sell">
               <span className="hidden min-[360px]:inline">Sell Your Car</span>
               <span className="min-[360px]:hidden">Sell</span>
-              <ArrowUpRight />
+              <ArrowUpRightIcon aria-hidden="true" focusable="false" />
             </Link>
           </Button>
           <button
@@ -60,7 +62,11 @@ export function Header() {
             aria-controls="mobile-navigation"
             onClick={() => setOpen(!open)}
           >
-            {open ? <X /> : <Menu />}
+            {open ? (
+              <XIcon aria-hidden="true" focusable="false" size={24} />
+            ) : (
+              <ListIcon aria-hidden="true" focusable="false" size={24} />
+            )}
           </button>
         </div>
       </div>

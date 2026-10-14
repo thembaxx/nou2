@@ -3,7 +3,9 @@ import { ResponsivePhoto } from "./responsive-photo";
 import { PhotoCredit } from "./photo-credit";
 import Link from "next/link";
 import { useState } from "react";
-import { Heart, MapPin, ArrowUpRight } from "lucide-react";
+import { HeartIcon } from "@phosphor-icons/react/dist/ssr/Heart";
+import { MapPinIcon } from "@phosphor-icons/react/dist/ssr/MapPin";
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import { useGarage } from "./providers";
 import type { Vehicle } from "@/lib/types";
 import { zar } from "@/lib/finance";
@@ -25,7 +27,13 @@ export function SaveButton({ id, className = "" }: { id: string; className?: str
         }
       }}
     >
-      <Heart size={18} fill={ids.includes(id) ? "#3679ff" : "none"} />
+      <HeartIcon
+        aria-hidden="true"
+        focusable="false"
+        size={18}
+        weight={ids.includes(id) ? "fill" : "regular"}
+        color={ids.includes(id) ? "#3679ff" : "currentColor"}
+      />
     </button>
   );
 }
@@ -70,7 +78,7 @@ export function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
         </p>
         <p className="mt-1 text-2xl font-bold">{zar(v.price)}</p>
         <p className="mt-4 flex items-center gap-1 text-xs text-slate-400">
-          <MapPin size={13} />
+          <MapPinIcon aria-hidden="true" focusable="false" size={13} />
           {v.location}
         </p>
         <Link
@@ -78,7 +86,7 @@ export function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
           href={`/vehicles/${v.id}`}
         >
           {v.reference ? "Model & Buying Options" : "Vehicle & Ownership Cost"}{" "}
-          <ArrowUpRight size={18} />
+          <ArrowUpRightIcon aria-hidden="true" focusable="false" size={18} />
         </Link>
         <PhotoCredit id={v.id} />
       </div>

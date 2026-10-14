@@ -6,6 +6,7 @@ import {
   planningEnergyPrice,
 } from "@/lib/vehicle-options";
 import { useState } from "react";
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import { AdaptiveCostChart } from "./adaptive-cost-chart";
 import Link from "next/link";
 import type { Vehicle } from "@/lib/types";
@@ -324,12 +325,15 @@ export function FinanceTool({ vehicles, initialId }: { vehicles: Vehicle[]; init
               <div className="mt-6 flex flex-wrap gap-3">
                 {vehicle && !vehicle.example && (
                   <Link
-                    className="squircle-button inline-flex min-h-12 items-center bg-blue-600 px-5 text-sm font-semibold text-white"
+                    className="squircle-button inline-flex min-h-12 items-center gap-2 bg-blue-600 px-5 text-sm font-semibold text-white"
                     href={vehicle.reference?.url || `/vehicles/${vehicle.id}`}
                     target={vehicle.reference ? "_blank" : undefined}
                     rel={vehicle.reference ? "noreferrer" : undefined}
                   >
-                    {vehicle.reference ? "Get A Dealer Quote ↗" : "Contact The Seller"}
+                    {vehicle.reference ? "Get A Dealer Quote" : "Contact The Seller"}
+                    {vehicle.reference && (
+                      <ArrowUpRightIcon aria-hidden="true" focusable="false" size={16} />
+                    )}
                   </Link>
                 )}
                 <Link

@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Check, ShieldCheck } from "lucide-react";
+import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowRight";
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
+import { CheckIcon } from "@phosphor-icons/react/dist/ssr/Check";
+import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
 import { VehicleCard } from "@/components/vehicle-card";
@@ -30,13 +33,13 @@ export default async function Home() {
               <Button asChild>
                 <Link href="/marketplace">
                   Shop New Cars
-                  <ArrowRight />
+                  <ArrowRightIcon aria-hidden="true" focusable="false" />
                 </Link>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/marketplace?inventory=sellers&condition=USED">
                   Shop Second Hand
-                  <ArrowUpRight />
+                  <ArrowUpRightIcon aria-hidden="true" focusable="false" />
                 </Link>
               </Button>
             </div>
@@ -52,12 +55,17 @@ export default async function Home() {
                   placeholder="Search make or model"
                 />
                 <Button type="submit" size="icon" aria-label="Search cars">
-                  <ArrowRight />
+                  <ArrowRightIcon aria-hidden="true" focusable="false" />
                 </Button>
               </div>
             </form>
             <p className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-slate-400">
-              <ShieldCheck size={16} className="mt-0.5 shrink-0 text-blue-300" />
+              <ShieldCheckIcon
+                aria-hidden="true"
+                focusable="false"
+                size={16}
+                className="mt-0.5 shrink-0 text-blue-300"
+              />
               Manufacturer reference prices, seller asking prices and cost estimates are clearly
               distinguished.
             </p>
@@ -80,7 +88,7 @@ export default async function Home() {
           <Button variant="outline" asChild>
             <Link href="/marketplace">
               View New Car Catalogue
-              <ArrowUpRight />
+              <ArrowUpRightIcon aria-hidden="true" focusable="false" />
             </Link>
           </Button>
         </Reveal>
@@ -114,7 +122,7 @@ export default async function Home() {
             <Button variant="outline" asChild>
               <Link href="/marketplace?inventory=sellers&condition=USED">
                 Browse Second Hand
-                <ArrowUpRight />
+                <ArrowUpRightIcon aria-hidden="true" focusable="false" />
               </Link>
             </Button>
           </Reveal>
@@ -139,7 +147,7 @@ export default async function Home() {
               <Button asChild className="self-center">
                 <Link href="/sell">
                   List A Car
-                  <ArrowUpRight />
+                  <ArrowUpRightIcon aria-hidden="true" focusable="false" />
                 </Link>
               </Button>
             </div>
@@ -191,7 +199,7 @@ export default async function Home() {
                 className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm text-blue-200"
               >
                 Explore Cars
-                <ArrowUpRight size={16} />
+                <ArrowUpRightIcon aria-hidden="true" focusable="false" size={16} />
               </Link>
             </Reveal>
           ))}
@@ -212,7 +220,7 @@ export default async function Home() {
             <Button className="mt-7" asChild variant="secondary">
               <Link href="/affordability">
                 Check My Budget
-                <ArrowRight />
+                <ArrowRightIcon aria-hidden="true" focusable="false" />
               </Link>
             </Button>
           </div>
@@ -227,7 +235,12 @@ export default async function Home() {
                 "For used cars, check ownership, service history and independent inspection.",
               ].map((text) => (
                 <li key={text} className="flex gap-3">
-                  <Check size={18} className="mt-0.5 shrink-0 text-blue-700" />
+                  <CheckIcon
+                    aria-hidden="true"
+                    focusable="false"
+                    size={18}
+                    className="mt-0.5 shrink-0 text-blue-700"
+                  />
                   {text}
                 </li>
               ))}
@@ -237,7 +250,7 @@ export default async function Home() {
               className="mt-7 inline-flex min-h-11 items-center gap-2 font-semibold text-blue-700"
             >
               Compare Two Cars
-              <ArrowUpRight size={18} />
+              <ArrowUpRightIcon aria-hidden="true" focusable="false" size={18} />
             </Link>
           </div>
         </Reveal>
@@ -254,7 +267,7 @@ export default async function Home() {
           <Button asChild>
             <Link href="/sell">
               Sell On Carpur
-              <ArrowUpRight />
+              <ArrowUpRightIcon aria-hidden="true" focusable="false" />
             </Link>
           </Button>
         </Reveal>

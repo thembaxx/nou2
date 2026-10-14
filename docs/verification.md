@@ -21,6 +21,12 @@ Sharper responsive photography, full-screen photo inspection, richer finite moti
 - Toyota Corolla Cross model metadata and CC BY licence were verified, but its embedded viewer failed. It is an external source link and attributed preview; no working embedded integration is claimed.
 - Licensed vendor decoder files are unmodified and excluded from lint/format. Source code remains checked. Attribution is in `public/models/CREDITS.md`.
 
+## Iconography follow-up
+
+All UI icons now use Phosphor React 2.1.10 through individual server-compatible imports. The Lucide dependency and three Unicode arrow icons in buying links were removed. Decorative SVGs are hidden from assistive technology; control names and 44px touch targets are retained. Saved cars use Phosphor's filled heart weight. Source scans find no emoji in app, component or library code.
+
+TypeScript, Oxlint, Oxfmt, all 40 unit tests, the production build and the dependency audit pass. Seven existing browser journeys pass for buying/garage, mobile navigation, photo inspection/pinch/pan/keyboard controls, reduced motion, layouts at seven widths, catalogue buying links/themes and lightweight model controls. Visual checks confirm Phosphor geometry, the filled saved state and no browser JavaScript errors. The final delivery records the production commit and public verification.
+
 ## Data provenance
 
 44 Toyota variants across ten official South African model pages were observed on 13 October 2026. The snapshot retains exact source records; the app supplies source links, observation dates and reference-price labels. Model year and stock are not invented. Missing Hiace consumption is disclosed. Charge-dependent PHEV lab figures are not treated as complete running costs. See `docs/catalogue.md`.

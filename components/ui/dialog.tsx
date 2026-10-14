@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
 import { cn } from "@/lib/utils";
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
@@ -27,7 +27,7 @@ export function DialogContent({
           className="absolute right-3 top-3 flex size-11 items-center justify-center rounded-xl"
           aria-label="Close dialog"
         >
-          <X size={18} />
+          <XIcon aria-hidden="true" focusable="false" size={18} />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>

@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { MoonIcon } from "@phosphor-icons/react/dist/ssr/Moon";
+import { SunIcon } from "@phosphor-icons/react/dist/ssr/Sun";
 type ThemeMode = "system" | "light" | "dark";
 const KEY = "carpur-theme-v1";
 const Context = createContext<{
@@ -49,7 +50,11 @@ export function ThemeToggle() {
       aria-label={`Switch to ${resolved === "dark" ? "light" : "dark"} theme`}
       onClick={() => setMode(resolved === "dark" ? "light" : "dark")}
     >
-      {resolved === "dark" ? <Sun size={19} /> : <Moon size={19} />}
+      {resolved === "dark" ? (
+        <SunIcon aria-hidden="true" focusable="false" size={19} />
+      ) : (
+        <MoonIcon aria-hidden="true" focusable="false" size={19} />
+      )}
     </button>
   );
 }
