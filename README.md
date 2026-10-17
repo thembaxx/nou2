@@ -1,4 +1,22 @@
-# Carpur
+# Carpur · Ownership forecasting
+
+A South African automotive marketplace project with editable vehicle-ownership forecasting.
+
+[Browse the source](https://github.com/thembaxx/nou2)
+
+## Engineering highlights
+
+Routed Next.js UI, Prisma/PostgreSQL and Better Auth tooling, plus Vitest and Playwright scripts. Deployment and external-service configuration must be verified separately.
+
+## Technology
+
+Declared in [package.json](package.json): Next.js `16.4.0` · React `^19.2.0` · TypeScript `^5.9.0` · Tailwind CSS `^4.1.0` · Three.js `^0.180.0` · Motion `^12.0.0` · React Three Fiber `^9.0.0` · Prisma `6.19.3` · Better Auth `1.7.7` · Zod `^4.0.0`.
+
+**Quality tooling:** `typecheck`, `lint`, `format:check`, `test`, `test:e2e` scripts are available. See the setup guide below for prerequisites; this documentation pass does not assert that those checks were run.
+
+---
+
+## Project guide
 
 South African automotive marketplace with editable ownership forecasting. Built from the supplied `carpur-source.zip`; its cinematic Carpur design, editorial imagery, initial financial module and product direction are retained and expanded into a routed application.
 
