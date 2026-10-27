@@ -1,6 +1,10 @@
 name: Prisma 7 migration lockfile recovery
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/prisma7-lockfile-recovery.yml"
   schedule:
     # Temporary one-week recovery window after October Actions credits reset.
     - cron: "17 05 1-7 11 *"
