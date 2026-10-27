@@ -1,3 +1,4 @@
+import { NotificationRetry } from "@/components/notification-retry";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentSession } from "@/lib/auth";
@@ -107,6 +108,7 @@ export default async function Page() {
             >
               Reply to {e.buyer.email}
             </a>
+            <NotificationRetry id={e.id} status={e.notificationStatus} />
           </article>
         ))}
       </section>

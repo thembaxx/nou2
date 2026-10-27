@@ -1,3 +1,4 @@
+import { transactionalEmailConfigured } from "@/lib/transactional-email";
 import { AuthForm } from "@/components/auth-form";
 import { authConfigured } from "@/lib/auth";
 import Link from "next/link";
@@ -11,7 +12,7 @@ export default function Page() {
         <br />
         You Moving.
       </h1>
-      <AuthForm available={authConfigured()} />
+      <AuthForm available={authConfigured()} emailReady={transactionalEmailConfigured()} />
       <Link href="/privacy" className="mt-6 inline-block text-sm text-blue-300">
         Privacy & marketplace terms
       </Link>

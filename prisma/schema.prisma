@@ -112,6 +112,10 @@ model Listing {
 }
 
 model Enquiry {
+  notificationStatus String @default("PENDING")
+  notificationAttemptedAt DateTime?
+  notificationProviderId String?
+  notificationAttempts Int @default(0)
   id        String   @id @default(cuid())
   listingId String
   listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
