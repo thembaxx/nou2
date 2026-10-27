@@ -1,3 +1,4 @@
+import { saveEnquiry } from "@/lib/enquiry-storage";
 import { getDb } from "@/lib/db";
 import { requireUser, readJson, rateLimit, apiFailure, ApiError } from "@/lib/http";
 import { enquirySchema } from "@/lib/validation";
@@ -25,9 +26,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         "Write at least 10 characters and agree to share your contact details.",
         400,
       );
-    const enquiry = await getDb().enquiry.create({
-      data: { listingId: id, buyerId: user.id, message: parsed.data.message },
-      select: { id: true },
+    const enquiry = await saveEnquiry({
+      listingId: id,
+      buyerId: user.id,
+      message: parsed.data.message,
     });
     let notification: "queued" | "unavailable" = "unavailable";
     if (transactionalEmailConfigured() && listing.user.emailVerified) {

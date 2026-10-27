@@ -236,4 +236,15 @@ describe("enquiry notification delivery boundary", () => {
     expect(subject.send).not.toHaveBeenCalled();
     expect(subject.updateMany).not.toHaveBeenCalled();
   });
+  it("missing notification columns leave the existing inbox available without a send", async () => {
+    const subject = setup();
+    subject.findUnique.mockRejectedValueOnce(
+      Object.assign(new Error("Column missing"), { code: "P2022" }),
+    );
+    expect(await sendEnquiryNotification(subject.row.id, subject.dependencies)).toEqual({
+      status: "UNAVAILABLE",
+    });
+    expect(subject.send).not.toHaveBeenCalled();
+    expect(subject.updateMany).not.toHaveBeenCalled();
+  });
 });

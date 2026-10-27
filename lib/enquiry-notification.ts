@@ -28,20 +28,28 @@ export async function sendEnquiryNotification(
   enquiryId: string,
   dependencies: Dependencies = {},
 ): Promise<{ status: EnquiryNotificationStatus }> {
-  const db = dependencies.db ?? getDb();
   const env = dependencies.env ?? process.env;
-  const enquiry = await db.enquiry.findUnique({
-    where: { id: enquiryId },
-    select: {
-      id: true,
-      createdAt: true,
-      notificationStatus: true,
-      notificationAttempts: true,
-      listing: {
-        select: { user: { select: { email: true, emailVerified: true } } },
+  if (!transactionalEmailConfigured(env)) return { status: "UNAVAILABLE" };
+  const db = dependencies.db ?? getDb();
+  const enquiry = await db.enquiry
+    .findUnique({
+      where: { id: enquiryId },
+      select: {
+        id: true,
+        createdAt: true,
+        notificationStatus: true,
+        notificationAttempts: true,
+        listing: {
+          select: { user: { select: { email: true, emailVerified: true } } },
+        },
       },
-    },
-  });
+    })
+    .catch((error: unknown) => {
+      if (error && typeof error === "object" && "code" in error && error.code === "P2022")
+        return undefined;
+      throw error;
+    });
+  if (enquiry === undefined) return { status: "UNAVAILABLE" };
   if (!enquiry) return { status: "NOT_FOUND" };
   if (enquiry.notificationStatus === "ACCEPTED") return { status: "ACCEPTED" };
   const seller = enquiry.listing.user;
