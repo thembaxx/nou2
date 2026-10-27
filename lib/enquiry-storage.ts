@@ -1,6 +1,6 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "./generated/prisma/client";
 import { getDb } from "./db";
 
 /** Use the stable inbox columns during the additive notification migration rollout. */
