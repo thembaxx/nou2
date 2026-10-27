@@ -1,0 +1,87 @@
+name: Prisma 7 migration lockfile recovery
+on:
+  workflow_dispatch:
+  schedule:
+    # Temporary one-week recovery window after October Actions credits reset.
+    - cron: "17 05 1-7 11 *"
+permissions:
+  contents: write
+concurrency:
+  group: nou2-prisma7-lockfile-recovery
+  cancel-in-progress: false
+jobs:
+  regenerate:
+    if: github.repository == 'thembaxx/nou2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: migration/prisma7-neon-coordinated-20261027
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Confirm migration scope
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const p = JSON.parse(readFileSync("package.json", "utf8"));
+          for (const value of [
+            p.dependencies["@prisma/client"],
+            p.dependencies["@prisma/adapter-neon"],
+            p.devDependencies.prisma
+          ]) {
+            if (value !== "7.10.1") throw new Error("Migration versions changed; refusing automatic lockfile refresh.");
+          }
+          if (p.engines.node !== ">=22.12") throw new Error("Unexpected Node engine range.");
+          NODE
+      - name: Check if lockfile already matches
+        id: lock
+        run: |
+          if pnpm deps:check; then
+            echo "ready=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=no" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Regenerate lockfile with real registry metadata
+        if: steps.lock.outputs.ready != 'yes'
+        run: pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
+      - name: Verify lockfile specifiers
+        if: steps.lock.outputs.ready != 'yes'
+        run: pnpm deps:check
+      - name: Verify frozen installation
+        if: steps.lock.outputs.ready != 'yes'
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Generate Prisma client
+        if: steps.lock.outputs.ready != 'yes'
+        run: pnpm db:generate
+      - name: Check Prisma schema
+        if: steps.lock.outputs.ready != 'yes'
+        run: pnpm db:validate
+      - name: Typecheck
+        if: steps.lock.outputs.ready != 'yes'
+        run: pnpm typecheck
+      - name: Unit tests
+        if: steps.lock.outputs.ready != 'yes'
+        run: pnpm test
+      - name: Production build
+        if: steps.lock.outputs.ready != 'yes'
+        run: pnpm build
+      - name: Commit verified lockfile to migration PR (never main)
+        if: steps.lock.outputs.ready != 'yes'
+        run: |
+          git add -- pnpm-lock.yaml
+          if git diff --cached --quiet; then
+            echo "No lockfile differences. No commit needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(prisma7): regenerate and verify frozen pnpm lockfile"
+          git push origin HEAD:refs/heads/migration/prisma7-neon-coordinated-20261027
