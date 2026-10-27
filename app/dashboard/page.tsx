@@ -1,3 +1,4 @@
+import { notificationStatuses } from "@/lib/enquiry-storage";
 import { NotificationRetry } from "@/components/notification-retry";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -17,13 +18,17 @@ export default async function Page() {
   });
   const enquiries = await getDb().enquiry.findMany({
     where: { listing: { userId: session.user.id } },
-    include: {
+    select: {
+      id: true,
+      message: true,
+      createdAt: true,
       listing: { select: { name: true } },
       buyer: { select: { name: true, email: true } },
     },
     orderBy: { createdAt: "desc" },
     take: 100,
   });
+  const statuses = await notificationStatuses(enquiries.map((enquiry) => enquiry.id));
   return (
     <div className="page">
       <p className="eyebrow mb-4">Seller dashboard</p>
@@ -108,7 +113,7 @@ export default async function Page() {
             >
               Reply to {e.buyer.email}
             </a>
-            <NotificationRetry id={e.id} status={e.notificationStatus} />
+            <NotificationRetry id={e.id} status={statuses.get(e.id) ?? "UNAVAILABLE"} />
           </article>
         ))}
       </section>
