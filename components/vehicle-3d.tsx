@@ -156,7 +156,7 @@ function RealCar({
     }
     const group = rotating.current;
     if (!group) return;
-    if (animate) {
+    if (animate && !reducedMotion && mode !== "reduced") {
       group.rotation.y += Math.min(delta, 0.05) * 0.3;
       const now = performance.now();
       if (now - lastOrbit.current > 100) {
@@ -270,6 +270,22 @@ export default function Vehicle3D(props: SceneProps) {
       <Suspense fallback={null}>
         <RealCar {...props} />
       </Suspense>
+      {/* Decorative showroom turntable markings: no change to licensed car geometry. */}
+      {tier === "enhanced" && !softwareRendering && (
+        <group>
+          {[2.75, 3.1].map((radius, index) => (
+            <mesh key={radius} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004 + index * 0.001, 0]}>
+              <ringGeometry args={[radius - 0.015, radius + 0.015, 72]} />
+              <meshBasicMaterial
+                color={index === 0 ? "#95c1ed" : "#637fa3"}
+                transparent
+                depthWrite={false}
+                opacity={index === 0 ? 0.45 : 0.25}
+              />
+            </mesh>
+          ))}
+        </group>
+      )}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, -0.015, 0]}
