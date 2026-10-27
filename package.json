@@ -15,7 +15,7 @@
     "db:migrate": "prisma migrate deploy",
     "test:e2e": "playwright test",
     "db:migrate:http": "node --env-file=.env.local scripts/migrate-neon.mjs",
-    "assets:check": "node scripts/validate-3d-assets.mjs public/models --require-assets && node --test tests/validate-3d-assets.test.mjs"
+    "assets:check": "node scripts/validate-3d-assets.mjs public/models --require-assets && node --test scripts/validate-3d-assets.selfcheck.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
