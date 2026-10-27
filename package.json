@@ -16,7 +16,8 @@
     "test:e2e": "playwright test",
     "db:migrate:http": "node --env-file=.env.local scripts/migrate-neon.mjs",
     "assets:check": "node scripts/validate-3d-assets.mjs public/models --require-assets && node --test scripts/validate-3d-assets.selfcheck.mjs",
-    "deps:check": "node scripts/check-dependency-consistency.mjs"
+    "deps:check": "node scripts/check-dependency-consistency.mjs",
+    "db:validate": "prisma validate"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
@@ -58,12 +59,13 @@
     "vitest": "^5.0.5"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12"
   },
   "packageManager": "pnpm@10.18.0",
   "pnpm": {
     "overrides": {
       "deepmerge-ts": "8.0.0"
     }
-  }
+  },
+  "type": "module"
 }
