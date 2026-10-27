@@ -58,22 +58,7 @@ jobs:
       - name: Verify frozen installation
         if: steps.lock.outputs.ready != 'yes'
         run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Generate Prisma client
-        if: steps.lock.outputs.ready != 'yes'
-        run: pnpm db:generate
-      - name: Check Prisma schema
-        if: steps.lock.outputs.ready != 'yes'
-        run: pnpm db:validate
-      - name: Typecheck
-        if: steps.lock.outputs.ready != 'yes'
-        run: pnpm typecheck
-      - name: Unit tests
-        if: steps.lock.outputs.ready != 'yes'
-        run: pnpm test
-      - name: Production build
-        if: steps.lock.outputs.ready != 'yes'
-        run: pnpm build
-      - name: Commit verified lockfile to migration PR (never main)
+      - name: Commit frozen-installable lockfile to migration PR (never main)
         if: steps.lock.outputs.ready != 'yes'
         run: |
           git add -- pnpm-lock.yaml
@@ -85,3 +70,31 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "chore(prisma7): regenerate and verify frozen pnpm lockfile"
           git push origin HEAD:refs/heads/migration/prisma7-neon-coordinated-20261027
+
+  verify:
+    needs: regenerate
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: migration/prisma7-neon-coordinated-20261027
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm deps:check
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm db:generate
+      - run: pnpm db:validate
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
