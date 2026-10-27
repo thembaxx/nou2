@@ -232,6 +232,15 @@ function Studio({
 export default function Vehicle3D(props: SceneProps) {
   const { tier, maxDpr } = useDevicePreferences();
   const [softwareRendering, setSoftwareRendering] = useState(false);
+  const [originalTurntable, setOriginalTurntable] = useState<Group | null>(null);
+  useEffect(() => {
+    if (tier !== "enhanced" || softwareRendering) return;
+    let cancelled = false;
+    new GLTFLoader().load("/models/original/nou2-turntable.glb", ({ scene }) => {
+      if (!cancelled) setOriginalTurntable(scene);
+    }, undefined, () => { /* Keep the lightweight geometry fallback offline. */ });
+    return () => { cancelled = true; };
+  }, [tier, softwareRendering]);
   return (
     <Canvas
       frameloop="demand"
@@ -273,6 +282,7 @@ export default function Vehicle3D(props: SceneProps) {
       {/* Decorative showroom turntable markings: no change to licensed car geometry. */}
       {tier === "enhanced" && !softwareRendering && (
         <group>
+          {originalTurntable ? <primitive object={originalTurntable} position={[0, .027, 0]} dispose={null} /> : <>}
           {[2.75, 3.1].map((radius, index) => (
             <mesh key={radius} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004 + index * 0.001, 0]}>
               <ringGeometry args={[radius - 0.015, radius + 0.015, 72]} />
@@ -284,6 +294,7 @@ export default function Vehicle3D(props: SceneProps) {
               />
             </mesh>
           ))}
+          </>}
         </group>
       )}
       <mesh
