@@ -1,11 +1,9 @@
-# Automated Prisma 7 lockfile recovery
+# Prisma 7 production lockfile recovery
 
-Temporary GitHub Actions workflow: .github/workflows/prisma7-lockfile-recovery.yml. The October 2026 Actions minutes are exhausted, and this runtime cannot access the npm registry.
+**User-directed force merge:** PR #25 merged into `main` at `eec6a583680ee557d7ad866b34242d01a5f67bb2`, despite an independently confirmed mismatch between Prisma 7 in `package.json` and Prisma 6 in `pnpm-lock.yaml`. An install using `--frozen-lockfile` is expected to fail until repaired. The merge does not indicate a successful production build or database validation.
 
-The workflow can be dispatched manually when Actions credits return and is scheduled November 1–7 at 05:17 UTC. It runs only in thembaxx/nou2 against migration/prisma7-neon-coordinated-20261027, never main. It checks that Prisma CLI, Client and Neon adapter are all pinned to 7.10.1.
+The temporary Actions workflow `.github/workflows/prisma7-lockfile-recovery.yml` now checks out **main** rather than the superseded migration branch. It is scheduled November 1–7 at 05:17 UTC and can be manually dispatched. Only workflow-file edits trigger its one-time push event.
 
-The first job regenerates the lockfile from real npm registry metadata, checks importer specifiers and a frozen installation, then commits the resulting lockfile ONLY to draft PR #25. A separate read-only job then performs frozen installation, Prisma Client generation, schema validation, formatting, lint, TypeScript checks, unit tests and a production build. A later code/test failure never merges or changes production; the already-resolved lockfile remains on the draft branch for troubleshooting. A regeneration or frozen-install failure does not commit a lockfile.
+The job checks version pins, regenerates the lockfile from actual npm metadata, verifies the dependency guard and frozen installation, generates and validates Prisma Client, and runs formatting, lint, TypeScript, unit tests and a production build. A failed command does **not** update any branch. If the build succeeds and the lockfile changed, it pushes the repair to `repair/prisma7-lockfile-main` **for review**. It never pushes to main, merges a PR, connects to production Neon, or runs a database migration.
 
-This does NOT auto-merge the migration. A staging Neon verification of authentication, sessions, listings, enquiries and photos is still required. Never treat quota failures as passing tests. Clean up the temporary workflow after the November window or successful migration.
-
-Scheduled GitHub workflows run from the default branch, so the recovery workflow must be merged into main even though its checkout and commit operate on the isolated migration branch.
+The recovery branch must be reviewed and merged after the checks actually pass. It does not replace staging Neon testing of session/authentication, listings, garage, enquiries or photos. The workflow needs available GitHub Actions minutes and npm registry connectivity. Remove this temporary workflow after lockfile repair or after November 7.
