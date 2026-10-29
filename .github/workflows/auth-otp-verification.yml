@@ -1,0 +1,51 @@
+name: Auth OTP verification
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/auth-otp-verification.yml'
+      - 'lib/auth.ts'
+      - 'lib/auth-client.ts'
+      - 'lib/email-otp.ts'
+      - 'lib/email-otp.test.ts'
+      - 'components/auth-form.tsx'
+      - 'components/email-code-auth-form.tsx'
+      - 'app/sign-in/page.tsx'
+      - '.env.example'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  otp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.0
+      # The default branch's Prisma 6/7 lockfile mismatch is tracked
+      # separately. Regenerate only in ephemeral CI for feature validation.
+      - name: Install dependencies for validation
+        run: pnpm install --no-frozen-lockfile
+      - name: Generate Prisma client
+        run: pnpm db:generate
+        env:
+          DATABASE_URL: 'postgresql://auth_ci:ci@localhost:5432/auth_ci'
+      - name: OTP unit tests
+        run: pnpm exec vitest run lib/email-otp.test.ts lib/transactional-email.test.ts
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Build
+        run: pnpm build
+        env:
+          DATABASE_URL: 'postgresql://auth_ci:ci@localhost:5432/auth_ci'
+          BETTER_AUTH_SECRET: 'ci-test-only-please-never-deploy-this-key-123456789'
+          BETTER_AUTH_URL: 'http://localhost:3000'
+          CARPUR_EMAIL_OTP_ENABLED: 'false'
