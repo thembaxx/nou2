@@ -3,7 +3,7 @@ import { databaseConfigured, getDb } from "./db";
 import type { Vehicle } from "./types";
 import { examples } from "./examples";
 import { catalogue } from "./catalogue";
-import type { Listing, Prisma } from "@prisma/client";
+import type { Listing, Prisma } from "./generated/prisma/client";
 import { BODY_TYPES, FUEL_TYPES } from "./vehicle-options";
 
 export const INVENTORY_PAGE_SIZE = 24;
