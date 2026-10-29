@@ -1,0 +1,56 @@
+name: Repair Nou2 OTP branch Prisma lockfile
+on:
+  push:
+    branches: [feat/optional-email-code-auth]
+    paths:
+      - '.github/workflows/repair-otp-branch-lockfile.yml'
+permissions:
+  contents: write
+jobs:
+  repair:
+    if: github.repository == 'thembaxx/nou2' && github.actor == 'thembaxx'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/optional-email-code-auth
+          fetch-depth: 1
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Regenerate lockfile from published package manifests
+        run: pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
+      - name: Verify lockfile matches package declarations
+        run: pnpm deps:check
+      - name: Verify reproducible install
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Generate Prisma 7 client
+        run: pnpm db:generate
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Run tests
+        run: pnpm test
+      - name: Build production bundle
+        run: pnpm build
+        env:
+          DATABASE_URL: 'postgresql://auth_ci:ci@localhost:5432/auth_ci'
+          BETTER_AUTH_SECRET: 'ci-test-only-not-for-deployment-credential-123456789'
+          BETTER_AUTH_URL: 'http://localhost:3000'
+          CARPUR_EMAIL_OTP_ENABLED: 'false'
+      - name: Commit verified lockfile to existing PR branch
+        run: |
+          git add -- pnpm-lock.yaml
+          if git diff --cached --quiet; then
+            echo "No lockfile changes"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(deps): restore reproducible Prisma 7 dependency lockfile'
+          git push origin HEAD:refs/heads/feat/optional-email-code-auth
