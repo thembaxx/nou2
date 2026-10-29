@@ -4,7 +4,15 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 import { EmailCodeAuthForm } from "./email-code-auth-form";
-export function AuthForm({ available, emailReady = false, emailOtpReady = false }: { available: boolean; emailReady?: boolean; emailOtpReady?: boolean }) {
+export function AuthForm({
+  available,
+  emailReady = false,
+  emailOtpReady = false,
+}: {
+  available: boolean;
+  emailReady?: boolean;
+  emailOtpReady?: boolean;
+}) {
   const [signup, setSignup] = useState(false);
   const [emailCodeMode, setEmailCodeMode] = useState(false);
   const [name, setName] = useState("");
@@ -19,7 +27,8 @@ export function AuthForm({ available, emailReady = false, emailOtpReady = false 
         costs.
       </p>
     );
-  if (emailCodeMode && emailOtpReady) return <EmailCodeAuthForm onPassword={() => setEmailCodeMode(false)} />;
+  if (emailCodeMode && emailOtpReady)
+    return <EmailCodeAuthForm onPassword={() => setEmailCodeMode(false)} />;
   return (
     <form
       className="panel p-7"
@@ -32,7 +41,10 @@ export function AuthForm({ available, emailReady = false, emailOtpReady = false 
             ? await authClient.signUp.email({ name, email, password })
             : await authClient.signIn.email({ email, password });
           if (result.error) setError(result.error.message || "Could not sign in.");
-          else if (signup && emailReady) setError("Check your email to verify your account, then sign in. Email ownership does not verify seller identity.");
+          else if (signup && emailReady)
+            setError(
+              "Check your email to verify your account, then sign in. Email ownership does not verify seller identity.",
+            );
           else window.location.assign("/dashboard");
         } catch {
           setError("Could not reach the account service. Please try again.");
@@ -85,7 +97,8 @@ export function AuthForm({ available, emailReady = false, emailOtpReady = false 
       </label>
       {signup && (
         <p className="mt-3 text-xs text-slate-400">
-          Use at least 12 characters and a password manager. Recovery and verification need configured account email.
+          Use at least 12 characters and a password manager. Recovery and verification need
+          configured account email.
         </p>
       )}
       {error && (
@@ -106,11 +119,47 @@ export function AuthForm({ available, emailReady = false, emailOtpReady = false 
       >
         {signup ? "Already have an account? Sign in" : "New to Carpur? Create an account"}
       </button>
-      {emailOtpReady && !signup && <button type="button" className="mt-4 block w-full text-sm text-blue-300" onClick={() => { setEmailCodeMode(true); setError(""); }}>Sign in with an email code</button>}
-      <Link href="/forgot-password" className="mt-5 block text-sm text-blue-300">Forgot password?</Link>
-      {emailReady && <button type="button" className="mt-4 text-sm text-blue-300" disabled={pending || !email} onClick={async () => {
-        setPending(true); try { const result = await authClient.sendVerificationEmail({ email, callbackURL: "/dashboard" }); setError(result.error?.message || "If verification is available for this account, an email has been requested."); } catch { setError("Verification could not be requested."); } finally { setPending(false); }
-      }}>Request verification email</button>}
+      {emailOtpReady && !signup && (
+        <button
+          type="button"
+          className="mt-4 block w-full text-sm text-blue-300"
+          onClick={() => {
+            setEmailCodeMode(true);
+            setError("");
+          }}
+        >
+          Sign in with an email code
+        </button>
+      )}
+      <Link href="/forgot-password" className="mt-5 block text-sm text-blue-300">
+        Forgot password?
+      </Link>
+      {emailReady && (
+        <button
+          type="button"
+          className="mt-4 text-sm text-blue-300"
+          disabled={pending || !email}
+          onClick={async () => {
+            setPending(true);
+            try {
+              const result = await authClient.sendVerificationEmail({
+                email,
+                callbackURL: "/dashboard",
+              });
+              setError(
+                result.error?.message ||
+                  "If verification is available for this account, an email has been requested.",
+              );
+            } catch {
+              setError("Verification could not be requested.");
+            } finally {
+              setPending(false);
+            }
+          }}
+        >
+          Request verification email
+        </button>
+      )}
       {signup && (
         <p className="mt-5 text-xs leading-relaxed text-slate-400">
           By creating an account, you agree to the privacy and marketplace terms. Do not send

@@ -65,16 +65,20 @@ function createAuth() {
     },
     session: { expiresIn: 60 * 60 * 24 * 7 },
     plugins: [
-      ...(emailOtpConfigured() ? [emailOTP({
-        otpLength: 6,
-        expiresIn: 300,
-        allowedAttempts: 3,
-        storeOTP: "hashed",
-        disableSignUp: true,
-        async sendVerificationOTP({ email, otp, type }) {
-          await sendCarpurSignInCode({email, otp, type});
-        },
-      })] : []),
+      ...(emailOtpConfigured()
+        ? [
+            emailOTP({
+              otpLength: 6,
+              expiresIn: 300,
+              allowedAttempts: 3,
+              storeOTP: "hashed",
+              disableSignUp: true,
+              async sendVerificationOTP({ email, otp, type }) {
+                await sendCarpurSignInCode({ email, otp, type });
+              },
+            }),
+          ]
+        : []),
       nextCookies(),
     ],
   });

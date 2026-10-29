@@ -13,7 +13,11 @@ export default function Page() {
         <br />
         You Moving.
       </h1>
-      <AuthForm available={authConfigured()} emailReady={transactionalEmailConfigured()} emailOtpReady={emailOtpConfigured()} />
+      <AuthForm
+        available={authConfigured()}
+        emailReady={transactionalEmailConfigured()}
+        emailOtpReady={emailOtpConfigured()}
+      />
       <Link href="/privacy" className="mt-6 inline-block text-sm text-blue-300">
         Privacy & marketplace terms
       </Link>
