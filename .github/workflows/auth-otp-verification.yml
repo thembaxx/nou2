@@ -28,16 +28,8 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10.18.0
-      # The default branch's Prisma 6/7 lockfile mismatch is tracked
-      # separately. Regenerate only in ephemeral CI for feature validation.
       - name: Install dependencies for validation
-        run: pnpm install --no-frozen-lockfile
-      - name: Store generated dependency lockfile for reviewed regeneration
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-prisma7-lockfile
-          path: pnpm-lock.yaml
-          if-no-files-found: error
+        run: pnpm install --frozen-lockfile
       - name: Generate Prisma client
         run: pnpm db:generate
         env:
