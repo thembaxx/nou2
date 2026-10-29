@@ -1,6 +1,6 @@
 import "server-only";
 import { createHash } from "node:crypto";
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "./generated/prisma/client";
 import { getDb } from "./db";
 import {
   sendTransactionalEmail,

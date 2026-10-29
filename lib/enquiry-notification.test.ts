@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "./generated/prisma/client";
 import { sendEnquiryNotification } from "./enquiry-notification";
 import type { sendTransactionalEmail } from "./transactional-email";
 
