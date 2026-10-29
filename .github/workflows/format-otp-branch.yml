@@ -24,9 +24,9 @@ jobs:
           version: 10.18.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Format auth feature paths only
-        run: pnpm exec oxfmt lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md .github/workflows/auth-otp-verification.yml
+        run: pnpm exec oxfmt lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md
       - name: Verify new code format
-        run: pnpm exec oxfmt --check lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md .github/workflows/auth-otp-verification.yml
+        run: pnpm exec oxfmt --check lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md
       - run: pnpm db:generate
       - run: pnpm typecheck
       - run: pnpm lint
@@ -39,7 +39,7 @@ jobs:
           CARPUR_EMAIL_OTP_ENABLED: 'false'
       - name: Commit formatting to OTP branch
         run: |
-          git add -- lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md .github/workflows/auth-otp-verification.yml
+          git add -- lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md
           if git diff --cached --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
