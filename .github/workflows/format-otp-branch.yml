@@ -1,0 +1,47 @@
+name: Format Nou2 OTP branch
+on:
+  push:
+    branches: [feat/optional-email-code-auth]
+    paths:
+      - '.github/workflows/format-otp-branch.yml'
+permissions:
+  contents: write
+jobs:
+  format:
+    if: github.repository == 'thembaxx/nou2' && github.actor == 'thembaxx'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/optional-email-code-auth
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Format auth feature paths only
+        run: pnpm exec oxfmt lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md .github/workflows/auth-otp-verification.yml
+      - name: Verify new code format
+        run: pnpm exec oxfmt --check lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md .github/workflows/auth-otp-verification.yml
+      - run: pnpm db:generate
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+        env:
+          DATABASE_URL: 'postgresql://auth_ci:ci@localhost:5432/auth_ci'
+          BETTER_AUTH_SECRET: 'ci-test-only-never-deploy-this-value-123456789'
+          BETTER_AUTH_URL: 'http://localhost:3000'
+          CARPUR_EMAIL_OTP_ENABLED: 'false'
+      - name: Commit formatting to OTP branch
+        run: |
+          git add -- lib/auth.ts lib/auth-client.ts lib/email-otp.ts lib/email-otp.test.ts components/auth-form.tsx components/email-code-auth-form.tsx app/sign-in/page.tsx README.md .github/workflows/auth-otp-verification.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'style(auth): format passwordless sign-in implementation'
+          git push origin HEAD:refs/heads/feat/optional-email-code-auth
