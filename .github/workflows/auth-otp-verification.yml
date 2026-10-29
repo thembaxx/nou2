@@ -32,6 +32,12 @@ jobs:
       # separately. Regenerate only in ephemeral CI for feature validation.
       - name: Install dependencies for validation
         run: pnpm install --no-frozen-lockfile
+      - name: Store generated dependency lockfile for reviewed regeneration
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-prisma7-lockfile
+          path: pnpm-lock.yaml
+          if-no-files-found: error
       - name: Generate Prisma client
         run: pnpm db:generate
         env:
