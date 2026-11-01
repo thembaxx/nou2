@@ -1,0 +1,57 @@
+name: One-time formatting drift repair
+on:
+  push:
+    branches: [fix/nou2-oxfmt-drift-20261101]
+    paths:
+      - ".github/workflows/format-drift-once.yml"
+permissions:
+  contents: write
+jobs:
+  format-and-verify:
+    if: github.repository == 'thembaxx/nou2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Verify dependencies and install
+        run: |
+          pnpm deps:check
+          pnpm install --frozen-lockfile
+      - name: Format only files reported by CI on 2026-10-30
+        run: |
+          pnpm exec oxfmt ".github/workflows/auth-otp-verification.yml" "app/forgot-password/page.tsx" "app/layout.tsx" "app/reset-password/page.tsx" "components/account-recovery.tsx" "components/vehicle-3d.tsx" "docs/original-3d-vignette.md" "package.json" "public/3d-preview.html" "public/vision/app.js" "public/vision/index.html" "public/vision/model-worker.js" "public/vision/style.css" "public/vision/sw.js" "scripts/check-dependency-consistency.mjs" "scripts/validate-3d-assets.mjs" "scripts/validate-3d-assets.selfcheck.mjs"
+      - name: Verify full formatting gate
+        run: pnpm format:check
+      - name: Verify Prisma generation and schema
+        run: |
+          pnpm db:generate
+          pnpm db:validate
+      - name: Verify lint, types, tests and build
+        run: |
+          pnpm lint
+          pnpm typecheck
+          pnpm test
+          pnpm build
+      - name: Remove one-time workflow and publish reviewed formatting branch
+        run: |
+          git rm -- .github/workflows/format-drift-once.yml
+          git add -- ".github/workflows/auth-otp-verification.yml" "app/forgot-password/page.tsx" "app/layout.tsx" "app/reset-password/page.tsx" "components/account-recovery.tsx" "components/vehicle-3d.tsx" "docs/original-3d-vignette.md" "package.json" "public/3d-preview.html" "public/vision/app.js" "public/vision/index.html" "public/vision/model-worker.js" "public/vision/style.css" "public/vision/sw.js" "scripts/check-dependency-consistency.mjs" "scripts/validate-3d-assets.mjs" "scripts/validate-3d-assets.selfcheck.mjs"
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No formatting drift to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: apply Oxfmt to 17 existing CI-reported files"
+          git push origin HEAD:refs/heads/fix/nou2-oxfmt-drift-20261101
