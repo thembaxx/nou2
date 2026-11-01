@@ -42,16 +42,20 @@ jobs:
           pnpm typecheck
           pnpm test
           pnpm build
-      - name: Remove one-time workflow and publish reviewed formatting branch
+      - name: Print formatted OTP workflow for safe separate update
         run: |
-          git rm -- .github/workflows/format-drift-once.yml
-          git add -- ".github/workflows/auth-otp-verification.yml" "app/forgot-password/page.tsx" "app/layout.tsx" "app/reset-password/page.tsx" "components/account-recovery.tsx" "components/vehicle-3d.tsx" "docs/original-3d-vignette.md" "package.json" "public/3d-preview.html" "public/vision/app.js" "public/vision/index.html" "public/vision/model-worker.js" "public/vision/style.css" "public/vision/sw.js" "scripts/check-dependency-consistency.mjs" "scripts/validate-3d-assets.mjs" "scripts/validate-3d-assets.selfcheck.mjs"
+          echo 'BEGIN_FORMATTED_OTP_WORKFLOW'
+          cat .github/workflows/auth-otp-verification.yml
+          echo 'END_FORMATTED_OTP_WORKFLOW'
+      - name: Commit only non-workflow formatting changes
+        run: |
+          git add -- app/forgot-password/page.tsx app/layout.tsx app/reset-password/page.tsx components/account-recovery.tsx components/vehicle-3d.tsx docs/original-3d-vignette.md package.json public/3d-preview.html public/vision/app.js public/vision/index.html public/vision/model-worker.js public/vision/style.css public/vision/sw.js scripts/check-dependency-consistency.mjs scripts/validate-3d-assets.mjs scripts/validate-3d-assets.selfcheck.mjs
           git diff --cached --check
           if git diff --cached --quiet; then
-            echo "No formatting drift to commit."
+            echo "No non-workflow formatting changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "style: apply Oxfmt to 17 existing CI-reported files"
+          git commit -m "style: format 16 existing non-workflow files with Oxfmt"
           git push origin HEAD:refs/heads/fix/nou2-oxfmt-drift-20261101
