@@ -192,7 +192,7 @@
         }
         function compile(type, id) {
           const shader = gl.createShader(type);
-          gl.shaderSource(shader, document.getElementById(id).textContent);
+          gl.shaderSource(shader, document.getElementById(id).textContent.trimStart());
           gl.compileShader(shader);
           if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
             throw Error(gl.getShaderInfoLog(shader));
