@@ -2,6 +2,7 @@
   "name": "carpur",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -66,6 +67,5 @@
     "overrides": {
       "deepmerge-ts": "8.0.0"
     }
-  },
-  "type": "module"
+  }
 }

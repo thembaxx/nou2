@@ -15,7 +15,10 @@ function specifier(name) {
   const marker = "      " + key + ":\n        specifier: ";
   const start = importer.indexOf(marker);
   if (start === -1) return null;
-  return importer.slice(start + marker.length).split("\n", 1)[0].trim();
+  return importer
+    .slice(start + marker.length)
+    .split("\n", 1)[0]
+    .trim();
 }
 
 const cli = pkg.devDependencies?.prisma;
@@ -34,8 +37,11 @@ for (const [name, version] of [
 ]) {
   if (version && specifier(name) !== version) {
     errors.push(
-      name + ": pnpm importer specifier " + JSON.stringify(specifier(name)) +
-      " does not match " + JSON.stringify(version),
+      name +
+        ": pnpm importer specifier " +
+        JSON.stringify(specifier(name)) +
+        " does not match " +
+        JSON.stringify(version),
     );
   }
 }
