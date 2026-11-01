@@ -242,9 +242,13 @@ export default function Vehicle3D(props: SceneProps) {
         if (!cancelled) setOriginalTurntable(scene);
       },
       undefined,
-      () => { /* Keep the lightweight geometry fallback offline. */ },
+      () => {
+        /* Keep the lightweight geometry fallback offline. */
+      },
     );
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [tier, softwareRendering]);
   return (
     <Canvas
@@ -287,19 +291,27 @@ export default function Vehicle3D(props: SceneProps) {
       {/* Decorative showroom turntable markings: no change to licensed car geometry. */}
       {tier === "enhanced" && !softwareRendering && (
         <group>
-          {originalTurntable ? <primitive object={originalTurntable} position={[0, .027, 0]} dispose={null} /> : <>
-          {[2.75, 3.1].map((radius, index) => (
-            <mesh key={radius} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004 + index * 0.001, 0]}>
-              <ringGeometry args={[radius - 0.015, radius + 0.015, 72]} />
-              <meshBasicMaterial
-                color={index === 0 ? "#95c1ed" : "#637fa3"}
-                transparent
-                depthWrite={false}
-                opacity={index === 0 ? 0.45 : 0.25}
-              />
-            </mesh>
-          ))}
-          </>}
+          {originalTurntable ? (
+            <primitive object={originalTurntable} position={[0, 0.027, 0]} dispose={null} />
+          ) : (
+            <>
+              {[2.75, 3.1].map((radius, index) => (
+                <mesh
+                  key={radius}
+                  rotation={[-Math.PI / 2, 0, 0]}
+                  position={[0, 0.004 + index * 0.001, 0]}
+                >
+                  <ringGeometry args={[radius - 0.015, radius + 0.015, 72]} />
+                  <meshBasicMaterial
+                    color={index === 0 ? "#95c1ed" : "#637fa3"}
+                    transparent
+                    depthWrite={false}
+                    opacity={index === 0 ? 0.45 : 0.25}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
         </group>
       )}
       <mesh
