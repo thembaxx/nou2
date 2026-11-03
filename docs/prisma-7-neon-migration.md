@@ -1,23 +1,29 @@
-# Prisma 7 + Neon migration candidate (not production-ready until verified)
+# Prisma 7 + Neon migration: implementation and validation
 
-This branch migrates Nou2 from Prisma ORM 6.19.3 to **7.10.1** using its existing Neon serverless runtime driver, the matching `@prisma/adapter-neon` package, `ws`, and the new generated `prisma-client` TypeScript output.
+## Current status (verified November 2, 2026)
 
-This is deliberately a **draft** migration PR. The execution environment cannot reach the npm registry and GitHub Actions capacity has been exhausted. `pnpm-lock.yaml` remains **unchanged**, and `pnpm deps:check` intentionally rejects the mismatch. Do not merge this branch or deploy it until a genuine lockfile refresh and build has passed.
+Nou2 uses Prisma ORM **7.10.1** with `@prisma/client` and `@prisma/adapter-neon` at the same version. PR [#25](https://github.com/thembaxx/nou2/pull/25) was explicitly force-merged at `eec6a583680ee557d7ad866b34242d01a5f67bb2` before the original lockfile could be verified. That temporary mismatch was repaired in merged auth OTP PR [#30](https://github.com/thembaxx/nou2/pull/30) at `9bb58c6127334a830acb70a1988267dcc295a6df`.
 
-## Complete the migration
+The October 30 main CI run [41013882711](https://github.com/thembaxx/nou2/actions/runs/41013882711) verified dependency consistency, frozen install and Prisma Client generation but identified formatting drift. PR [#36](https://github.com/thembaxx/nou2/pull/36) repaired the formatting and the WebGL2 shader source issue; it was merged at `7a21e63187d8d75c5ca8674c71665f7da0b5492b`.
 
-1. Run with Node >=22.12 and pnpm 10.18.0: `pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile`. Commit the resulting `pnpm-lock.yaml` as part of this PR, never a hand-edited or transplanted lockfile.
-2. Run `pnpm install --frozen-lockfile`, `pnpm deps:check`, `pnpm db:generate`, `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` without production database credentials.
-3. Test DB-backed account sessions and email sign-in, enquiry persistence, listings, garage, and photo routes against a dedicated **non-production** Neon branch. Verify TLS/WebSocket connection handling and timeouts. In production, `DATABASE_URL` should use a pooled connection; the optional `DIRECT_URL` is for Prisma migrations.
-4. Verify `pnpm db:migrate` against the isolated Neon branch and confirm `prisma migrate diff` reports no unintended destructive schema changes. **Do not run migrations against production** until database backup and approval.
-5. Inspect Vercel deployment logs and confirm protected endpoints, auth callbacks and model generation on Node 24. If any check fails, retain Prisma 6 on `main`.
+The [post-merge quality gates](https://github.com/thembaxx/nou2/actions/runs/41285126399) and the [November 1 lockfile recovery verification](https://github.com/thembaxx/nou2/actions/runs/41303774582) both succeeded. The latter ran dependency consistency, frozen installation, Prisma Client generation, schema validation, formatting, lint, TypeScript checks, unit tests and a production build. No lockfile repair branch was necessary. The temporary recovery workflow was removed after successful verification.
 
-## Code details
+**These checks do not establish live database compatibility or a successful production deployment.** They do not authorize production database migrations.
 
-- Schema generator now uses `prisma-client` and `lib/generated/prisma`. The generated output is gitignored. Generation runs before the production build and in CI before type checking.
-- The Prisma datasource URL has moved from `schema.prisma` to `prisma.config.ts`. This uses an optional environment read because `prisma generate` does not need a live connection.
-- Runtime reuses one `PrismaNeon` and `PrismaClient` instance across requests, with explicit WebSocket support. Existing Better Auth's Prisma adapter continues to use `getDb()`.
-- All server-side Prisma type imports in the enquiry storage and tests now reference the generated client path.
-- The frozen-lockfile guard merged in #23 is intentionally retained; mismatches **must not be waived** as an Actions quota issue.
+## Implementation notes
+
+- The generator uses Prisma 7 `prisma-client` and writes ignored TypeScript output to `lib/generated/prisma`. Generation is required before build and type checking.
+- The datasource URL is configured in `prisma.config.ts`, with optional environment access for commands such as `prisma generate` that do not need a live connection.
+- Runtime uses a shared `PrismaClient` with the `PrismaNeon` adapter and WebSocket support. Better Auth uses `getDb()`.
+- Server-side Prisma type imports point to the generated client. The dependency consistency guard remains mandatory.
+
+## Outstanding database and deployment verification
+
+1. Provision or select a dedicated **non-production** Neon branch, with test-only credentials. Do not use production `DATABASE_URL` or `DIRECT_URL`.
+2. Configure the staging pooled `DATABASE_URL` for runtime traffic (`lib/db.ts`) and the staging direct `DIRECT_URL` for Prisma CLI operations (`prisma.config.ts`). Confirm both point to the isolated staging Neon branch before running commands; `prisma.config.ts` otherwise falls back to `DATABASE_URL`.
+3. Validate Better Auth email OTP and sessions, protected listings, garage, enquiries, and photo routes end-to-end against staging, including connection failures, WebSocket/TLS handling and timeouts.
+4. Inspect migration compatibility on staging only. Use `prisma migrate diff` to review schema differences for destructive changes **before** applying anything. The `pnpm db:migrate` script runs `prisma migrate deploy` and changes the target database: run it only on the isolated staging branch after reviewing the migration plan and obtaining approval. Never run it against production or use production credentials. Require a backup and explicit approval before any production migration.
+5. Independently confirm the Nou2 deployment and protected routes, if a Nou2-specific deployment integration is available. The connected Vercel `carpur` project is **not** a Nou2 deployment.
+6. Keep CI, frozen installation and build checks mandatory for subsequent Prisma or Neon changes.
 
 References: https://www.prisma.io/docs/guides/upgrade-prisma-orm/v7 and https://www.prisma.io/docs/orm/v7/reference/prisma-config-reference.
