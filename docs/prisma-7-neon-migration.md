@@ -20,9 +20,10 @@ The [post-merge quality gates](https://github.com/thembaxx/nou2/actions/runs/412
 ## Outstanding database and deployment verification
 
 1. Provision or select a dedicated **non-production** Neon branch, with test-only credentials. Do not use production `DATABASE_URL` or `DIRECT_URL`.
-2. Validate Better Auth email OTP and sessions, protected listings, garage, enquiries, and photo routes end-to-end against staging, including connection failures, WebSocket/TLS handling and timeouts.
-3. Inspect schema differences and migration compatibility on staging only. Do not execute destructive migrations or production writes; require a backup and explicit approval before any production migration.
-4. Independently confirm the Nou2 deployment and protected routes, if a Nou2-specific deployment integration is available. The connected Vercel `carpur` project is **not** a Nou2 deployment.
-5. Keep CI, frozen installation and build checks mandatory for subsequent Prisma or Neon changes.
+2. Configure the staging pooled `DATABASE_URL` for runtime traffic (`lib/db.ts`) and the staging direct `DIRECT_URL` for Prisma CLI operations (`prisma.config.ts`). Confirm both point to the isolated staging Neon branch before running commands; `prisma.config.ts` otherwise falls back to `DATABASE_URL`.
+3. Validate Better Auth email OTP and sessions, protected listings, garage, enquiries, and photo routes end-to-end against staging, including connection failures, WebSocket/TLS handling and timeouts.
+4. Inspect migration compatibility on staging only. Use `prisma migrate diff` to review schema differences for destructive changes **before** applying anything. The `pnpm db:migrate` script runs `prisma migrate deploy` and changes the target database: run it only on the isolated staging branch after reviewing the migration plan and obtaining approval. Never run it against production or use production credentials. Require a backup and explicit approval before any production migration.
+5. Independently confirm the Nou2 deployment and protected routes, if a Nou2-specific deployment integration is available. The connected Vercel `carpur` project is **not** a Nou2 deployment.
+6. Keep CI, frozen installation and build checks mandatory for subsequent Prisma or Neon changes.
 
 References: https://www.prisma.io/docs/guides/upgrade-prisma-orm/v7 and https://www.prisma.io/docs/orm/v7/reference/prisma-config-reference.
