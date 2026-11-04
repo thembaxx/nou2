@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   description:
     "A smarter South African automotive marketplace. Discover vehicles, compare ownership costs and understand your budget before you buy.",
   applicationName: "Carpur",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Carpur" },
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg", apple: "/icon-192.png" },
   openGraph: {
